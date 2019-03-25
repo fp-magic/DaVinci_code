@@ -1,5 +1,6 @@
 <!--index.wxml-->
 <view class="container">
+  <text>达芬奇密码</text>
   <view class="userinfo">
     <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
     <block wx:else>
@@ -7,20 +8,15 @@
       <text class="userinfo-nickname">{{userInfo.nickName}}</text>
     </block>
   </view>
-  <view class="usermotto">
-    <text class="user-motto">{{motto}}</text>
+  <view class="menu">
+    <navigator url='../game/game'>
+     <button>开始游戏</button>
+    </navigator>
+    <navigator url='../tutorial/tutorial'>
+    <button>教程</button>
+     </navigator>
+    <navigator url='../option/option'>
+     <button>设置</button>
+    </navigator>
   </view>
-  <view>
-    <button
-  type="primary"
-  size="{{primarySize}}"
-  loading="{{loading}}"
-  plain="{{plain}}"
-  disabled="{{disabled}}"
-  bindtap="primary">
-  primary
-</button>
-  </view>
-  <view>{{message}}</view>
-  <view bindtap="add">{{count}}</view>
 </view>
