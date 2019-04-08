@@ -1,12 +1,13 @@
 <view class="container">
   <view class="header">
-  <button type="primary"bindtouchstart="headerTouchStart"bindlongpress="headerLongTap"
-  bindtouchend="headerTouchEnd"bindtap="headerTap">点三秒退出</button>
+    <button type="primary" 
+    bindtouchstart="headerTouchStart" 
+    bindlongpress="headerLongTap" 
+    bindtouchend="headerTouchEnd" 
+    id="play"
+    bindtap="headerTap">点三秒退出</button>
   </view>
   <view class="playGame">
-    <canvas style="width: 375px; height: 500px;" 
-            canvas-id="gameCanvas"
-            bindtouchstart='touchGameStart'
-            bindtouchmove='touchGameStart'></canvas>
+    <canvas style="width: 375px; height: 500px;" canvas-id="gameCanvas" bindtouchstart='touchGameStart' bindtouchmove='touchGameStart'></canvas>
   </view>
-</view>
+</view> 
