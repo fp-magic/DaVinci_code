@@ -4,7 +4,7 @@
     bindtouchstart="headerTouchStart" 
     bindlongpress="headerLongTap" 
     bindtouchend="headerTouchEnd" 
-    id="play"
+    id="{{player0card0}}"
     bindtap="headerTap">点三秒退出</button>
   </view>
   <view class="playGame">

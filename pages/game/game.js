@@ -1,7 +1,8 @@
 Page({
   onLoad(nowPage) {
     this.setData({
-        title: nowPage.title
+      title: nowPage.title,
+      player0card0:player0.cardIndexToString[0]
     }),
     beginTime = 2
     showTime = 10
@@ -12,12 +13,15 @@ Page({
     console.log(cardArray)
     console.log(player1)
     if (playerNum == 4) { //发牌
-      for (var i = 0; i < 4; i++) player1.getCard()
-      for (var i = 0; i < 4; i++) player2.getCard()
-      for (var i = 0; i < 4; i++) player3.getCard()
-      for (var i = 0; i < 4; i++) player4.getCard()
+      for (var i = 0; i < 3; i++) player0.getCard()
+      for (var i = 0; i < 3; i++) player1.getCard()
+      for (var i = 0; i < 3; i++) player2.getCard()
+      for (var i = 0; i < 3; i++) player3.getCard()
     }
-
+    this.setData({
+      player0card0: player0.cardIndexToString[0]
+    })
+    player0.playerName="mary"
     console.log(player1)
     gameStatus = 1
 
@@ -61,10 +65,10 @@ let gameStatus, gameStatus2
  */
 let cardArray = new Array() //总牌组
 const app = getApp()
+let player0 = new player()
 let player1 = new player()
 let player2 = new player()
 let player3 = new player()
-let player4 = new player()
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
@@ -115,6 +119,7 @@ function changeState() {
  */
 function player() {
   this.cardIndex = new Array()
+  this.cardIndexToString = new Array()
   this.cardVisible = new Array()
   this.playerState = 0
   this.playerName = "jack"
@@ -139,6 +144,9 @@ player.prototype.getCard = function() {
         this.cardVisible[j] = tmp2
       }
     }
+  }
+  for(let i=0;i<this.cardNum;i++){
+    this.cardIndexToString[i]=this.cardIndex[i].toString()
   }
 }
 player.prototype.guessedJudge = function(guessCardLoc, guessCardIndex) {
