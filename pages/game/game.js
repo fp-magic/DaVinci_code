@@ -1,11 +1,13 @@
 Page({
   onLoad(nowPage) {
     this.setData({
-      title: nowPage.title,
-      player0card0:player0.cardIndexToString[0]
-    }),
-    beginTime = 2
+        title: nowPage.title,
+        player0card0: player0.cardIndexToString[0]
+      }),
+      beginTime = 2
     showTime = 10
+    playTime = 60
+    midTime = 5
     playerNum = 4
     gameStatus = 0
     changeState()
@@ -21,7 +23,7 @@ Page({
     this.setData({
       player0card0: player0.cardIndexToString[0]
     })
-    player0.playerName="mary"
+    player0.playerName = "mary"
     console.log(player1)
     gameStatus = 1
 
@@ -52,6 +54,7 @@ Page({
   }
 })
 let beginTime, showTime //进入时间,倒计时用时间
+let playTime, midTime //回合时间，回合中间时间
 let playerNum //游戏人数，默认为4
 let gameStatus, gameStatus2
 /*gameStatus:当前游戏状态
@@ -92,18 +95,18 @@ function shuffleSwap(arr) {
 /*以下用于定时，控制状态变化
  */
 function changeState() {
-  showTime-=1
+  showTime -= 1
   console.log(showTime)
-  if(showTime<=0){
-    if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8){
-      gameStatus+=1
-      showTime=60
-    }else{
-      if(gameStatus==1||gameStatus==3||gameStatus==5||gameStatus==7||gameStatus==9){
-        gameStatus+=1
-        showTime=5
-        if(gameStatus==10){
-          gameStatus=2
+  if (showTime <= 0) {
+    if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
+      gameStatus += 1
+      showTime = playTime
+    } else {
+      if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
+        gameStatus += 1
+        showTime = midTime
+        if (gameStatus == 10) {
+          gameStatus = 2
         }
       }
     }
@@ -124,13 +127,18 @@ function player() {
   this.playerState = 0
   this.playerName = "jack"
   this.cardNum = 0
+  this.lastCardIndex = 0
 }
+/*设置姓名
+ */
 player.prototype.setName = function(newName) {
   this.playerName = newName
 }
+/*抽一张牌
+ */
 player.prototype.getCard = function() {
-  let newCardIndex = cardArray.pop()
-  this.cardIndex.push(newCardIndex)
+  let lastCardIndex = cardArray.pop()
+  this.cardIndex.push(lastCardIndex)
   this.cardVisible.push(false)
   this.cardNum = this.cardNum + 1
   for (let i = 0; i < this.cardNum; i++) { //保持降序，牌数较少就直接冒泡排了
@@ -145,14 +153,32 @@ player.prototype.getCard = function() {
       }
     }
   }
-  for(let i=0;i<this.cardNum;i++){
-    this.cardIndexToString[i]=this.cardIndex[i].toString()
+  for (let i = 0; i < this.cardNum; i++) {
+    this.cardIndexToString[i] = this.cardIndex[i].toString()
   }
 }
+/*被猜牌
+ **guessCardLoc:被猜的牌的位置编号
+ **guessCardIndex:被猜的牌的实际编号
+ */
 player.prototype.guessedJudge = function(guessCardLoc, guessCardIndex) {
   if (this.cardIndex[guessCardLoc] == guessCardIndex) {
     this.cardVisible[guessCardLoc] = true
     return true
   }
   return false
+}
+/*猜牌成功的情况
+ */
+player.prototype.succussJudge = function() {
+  showTime = playTime
+}
+/*猜牌失败的情况
+ */
+player.prototype.failJudge = function() {
+  for (let i = 0; i < this.cardNum; i++) {
+    if (this.cardIndex[i] == this.lastCardIndex)
+      this.cardVisible[i] = true
+  }
+  showTime = 1
 }
