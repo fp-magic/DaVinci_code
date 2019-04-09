@@ -6,10 +6,12 @@ Page({
       }),
       beginTime = 2
     showTime = 10
-    playTime = 60
+    playTime = 20
     midTime = 5
     playerNum = 4
     gameStatus = 0
+    guessStatus = 0
+    aiMode = "freshman"
     changeState()
     cardArray = shuffleSwap(createArray(24)) //洗牌
     console.log(cardArray)
@@ -20,10 +22,13 @@ Page({
       for (var i = 0; i < 3; i++) player2.getCard()
       for (var i = 0; i < 3; i++) player3.getCard()
     }
+    player0.setLoc(0)
+    player1.setLoc(1)
+    player2.setLoc(2)
+    player3.setLoc(3)
     this.setData({
       player0card0: player0.cardIndexToString[0]
     })
-    player0.playerName = "mary"
     console.log(player1)
     gameStatus = 1
 
@@ -51,15 +56,42 @@ Page({
   },
   headerTap: function(e) {
     console.log(e.timeStamp + '- tap')
+  },
+  cardTouchEnd: function(e) { //之后配合前端进行修改
+    if (gameStatus != 3) return
+    guessPlayerLoc = Number("1") //分别表示点击的玩家编号的牌的编号
+    guessCardLoc = Number("1") //之后配合前端进行修改
+  },
+  listSelectEnd: function(e) { //之后配合前端进行修改
+    if (gameStatus != 3) return
+    guessCons = false
+    if (guessPlayerLoc == 1) {
+      guessCons = player1.guessedJudge(guessCardLoc, guessCardIndex)
+    } else
+    if (guessPlayerLoc == 2) {
+      guessCons = player2.guessedJudge(guessCardLoc, guessCardIndex)
+    } else
+    if (guessPlayerLoc == 3) {
+      guessCons = player3.guessedJudge(guessCardLoc, guessCardIndex)
+    }
+    if (guessCons == true) {
+      player0.succussJudge()
+    } else {
+      player0.failJudge()
+    }
+    guessStatus = 2
+    player0.guessed=true
   }
 })
 let beginTime, showTime //进入时间,倒计时用时间
 let playTime, midTime //回合时间，回合中间时间
 let playerNum //游戏人数，默认为4
-let gameStatus, gameStatus2
+let gameStatus, gameStatus2, guessStatus
+let guessPlayerLoc, guessCardLoc, guessCardIndex, guessCons //要猜的玩家位置编号,牌的位置编号,牌的实际编号和结果
+let aiMode //ai智商
 /*gameStatus:当前游戏状态
  **四人时0/1/2/3用于表示自己的状态
- **0表示未定
+ **0表示游戏结束
  **1表示游戏即将开始
  **2表示猜牌中
  **3表示猜牌结束
@@ -96,13 +128,62 @@ function shuffleSwap(arr) {
  */
 function changeState() {
   showTime -= 1
-  console.log(showTime)
+  console.log(showTime, gameStatus, guessStatus, playerNum)
+  if (guessStatus > 0) {
+    guessStatus -= 1
+  } else {
+    if (playerNum == 4) {
+      if(gameStatus==3){       
+      }
+      if (gameStatus == 5) {
+        player1.aiController()
+      } else if (gameStatus == 7){
+        player2.aiController()
+      }else if (gameStatus == 9){
+        player3.aiController()
+      }
+    } else {
+      //todo!
+    }
+  }
   if (showTime <= 0) {
     if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
       gameStatus += 1
+      if (gameStatus == 3) {
+        player0.getCard()
+        player0.guessed = false
+      } else if (gameStatus == 5) {
+        player1.getCard()
+        player1.guessed = false
+      } else if (gameStatus == 7) {
+        player2.getCard()
+        player2.guessed = false
+      } else if (gameStatus == 9) {
+        player3.getCard()
+        player3.guessed = false
+      }
       showTime = playTime
     } else {
+      if(cardArray.length<=0)gameStatus=0
+      console.log(cardArray)
       if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
+        if (gameStatus == 3) {
+          if(!player0.guessed){
+            player0.failJudge()
+          }
+        } else if (gameStatus == 5) {
+          if (!player1.guessed) {
+            player1.failJudge()
+          }
+        } else if (gameStatus == 7) {
+          if (!player2.guessed) {
+            player2.failJudge()
+          }
+        } else if (gameStatus == 9) {
+          if (!player3.guessed) {
+            player3.failJudge()
+          }
+        }
         gameStatus += 1
         showTime = midTime
         if (gameStatus == 10) {
@@ -119,6 +200,9 @@ function changeState() {
  **playerState:玩家当前状态
  **playerName:玩家昵称
  **cardNum:手牌数量
+ **lastCardIndex:抽的最后一张牌
+ **playerLoc:玩家的位置
+ **guessed:本回合是否猜过
  */
 function player() {
   this.cardIndex = new Array()
@@ -128,17 +212,25 @@ function player() {
   this.playerName = "jack"
   this.cardNum = 0
   this.lastCardIndex = 0
+  this.playerLoc = 0
+  this.guessed = true
 }
 /*设置姓名
  */
 player.prototype.setName = function(newName) {
   this.playerName = newName
 }
+/*设置位置
+ */
+player.prototype.setLoc = function(newLoc) {
+  this.playerLoc = newLoc
+}
 /*抽一张牌
  */
 player.prototype.getCard = function() {
-  let lastCardIndex = cardArray.pop()
-  this.cardIndex.push(lastCardIndex)
+  if (cardArray.length <= 0) return
+  this.lastCardIndex = cardArray.pop()
+  this.cardIndex.push(this.lastCardIndex)
   this.cardVisible.push(false)
   this.cardNum = this.cardNum + 1
   for (let i = 0; i < this.cardNum; i++) { //保持降序，牌数较少就直接冒泡排了
@@ -181,4 +273,44 @@ player.prototype.failJudge = function() {
       this.cardVisible[i] = true
   }
   showTime = 1
+}
+/*查看是否还有立牌
+ */
+player.prototype.haveUnvisibleCard = function() {
+  for (let i = 0; i < this.cardNum; i++) {
+    if (this.cardVisible[i] == false)
+      return true
+  }
+  return false
+}
+player.prototype.aiController = function() {
+  if (aiMode == "freshman") {
+    //随便找个人随便抽张牌随便猜个数
+    do {
+      guessPlayerLoc = Math.floor(Math.random() * (4))
+    } while (guessPlayerLoc == this.playerLoc)
+    guessCardLoc = Math.floor(Math.random() * (4))
+    guessCardIndex = Math.floor(Math.random() * (24))
+    guessCons = false
+    if (guessPlayerLoc == 0) {
+      guessCons = player0.guessedJudge(guessCardLoc, guessCardIndex)
+    } else
+    if (guessPlayerLoc == 1) {
+      guessCons = player1.guessedJudge(guessCardLoc, guessCardIndex)
+    } else
+    if (guessPlayerLoc == 2) {
+      guessCons = player2.guessedJudge(guessCardLoc, guessCardIndex)
+    } else
+    if (guessPlayerLoc == 3) {
+      guessCons = player3.guessedJudge(guessCardLoc, guessCardIndex)
+    }
+    if (guessCons == true) {
+      this.succussJudge()
+    } else {
+      this.failJudge()
+    }
+    console.log(guessCons, guessPlayerLoc, guessCardLoc, guessCardIndex)
+    guessStatus = 2
+    this.guessed=true
+  }
 }
