@@ -18,5 +18,8 @@
     <navigator url='../option/option'>
      <button>设置</button>
     </navigator>
+    <navigator url='../ranking/ranking'>
+     <button>排行榜</button>
+    </navigator>
   </view>
 </view>
