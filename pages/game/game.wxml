@@ -1,13 +1,159 @@
-<view class="container">
-  <view class="header">
-    <button type="primary" 
-    bindtouchstart="headerTouchStart" 
-    bindlongpress="headerLongTap" 
-    bindtouchend="headerTouchEnd" 
-    id="{{player0card0}}"
-    bindtap="headerTap">点三秒退出</button>
+<view class="game_body">
+
+  <view class="player3_cards">
+    <view class="cards_rowdisplay">
+      <cover-view class="cards_view" wx:for="{{player3_cards}}">
+        <button id="cards{{item}}" class="cards_button">
+          <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理 -->
+          <cover-image class="cards_image"
+          src="/images/{{item[0]=='w'?'whiteback':'blackback'}}.jpg" 
+          mode="aspectFit"></cover-image>
+        </button>
+      </cover-view>
+    </view>
+
+    <view id="player3_info" class="player_info">
+      <image class="player_avatar"
+      src="{{player3_avatar}}"
+      mode="aspectFit"></image>
+      <text class="player_nickname">{{player3_nickname}}</text>
+    </view>
   </view>
-  <view class="playGame">
-    <canvas style="width: 375px; height: 500px;" canvas-id="gameCanvas" bindtouchstart='touchGameStart' bindtouchmove='touchGameStart'></canvas>
+
+  <view class="middle">
+    <view class="player2_cards">
+      <view id="player2_info" class="player_info">
+        <image class="player_avatar"
+        src="{{player2_avatar}}"
+        mode="aspectFit"></image>
+        <text class="player_nickname">{{player2_nickname}}</text>
+      </view>
+      <view class="cards_columndisplay">
+          <cover-view class="cards_view" wx:for="{{player2_cards}}">
+            <button id="cards{{item}}" class="cards_button">
+              <cover-image class="cards_image"
+              src="/images/{{item[0]=='w'?'whiteback':'blackback'}}.jpg"
+              mode="aspectFit"></cover-image>
+            </button>
+          </cover-view>
+        </view>
+    </view>
+
+    <view class="other_cards">
+      <view class="cards_columndisplay">
+        <cover-view class="cards_view" wx:for="{{white_left}}">
+          <button id="cards{{item}}" class="cards_button">
+            <cover-image class="cards_image"
+            src="/images/whiteblank.jpg" 
+            mode="aspectFit"></cover-image>
+          </button>
+        </cover-view>
+      </view>
+      <view class="cards_columndisplay">
+        <cover-view class="cards_view" wx:for="{{black_left}}">
+          <button id="cards{{item}}" class="cards_button">
+            <cover-image class="cards_image"
+            src="/images/blackblank.jpg" 
+            mode="aspectFit"></cover-image>
+          </button>
+        </cover-view>
+      </view>
+    </view>
+
+    <view class="player4_cards">
+      <view class="cards_columndisplay">
+        <cover-view class="cards_view" wx:for="{{player4_cards}}">
+          <button id="cards{{item}}" class="cards_button">
+            <cover-image class="cards_image"
+            src="/images/{{item[0]=='w'?'whiteback':'blackback'}}.jpg"
+            mode="aspectFit"></cover-image>
+          </button>
+        </cover-view>
+      </view>
+
+      <view id="player3_info" class="player_info">
+        <image class="player_avatar"
+        src="{{player3_avatar}}"
+        mode="aspectFit"></image>
+        <text class="player_nickname">{{player4_nickname}}</text>
+      </view>
+    </view>
   </view>
-</view> 
+
+  <view class="player1_cards">
+    <view id="player1_info" class="player_info">
+      <image class="player_avatar"
+      src="{{player1_avatar}}"
+      mode="aspectFit"></image>
+      <text class="player_nickname">{{player1_nickname}}</text>
+    </view>
+
+    <view class="cards_rowdisplay">
+      <cover-view class="cards_view" wx:for="{{player1_cards}}">
+        <button id="cards{{item}}" class="cards_button">
+          <cover-image class="cards_image"
+          src="/images/{{item}}.jpg" 
+          mode="aspectFit"></cover-image>
+        </button>
+      </cover-view>
+    </view>
+  </view>
+
+</view>
+
+<view class="operations">
+  <!-- 当前玩家进入游戏回合 -->
+  <view class="action" wx:if="{{Ismyturn}}">
+    <!-- 如果桌面上有剩余的牌 -->
+    <view wx:if="{{Havecardsleft}}">
+      <!-- 提示用户选择一张剩余的牌 -->
+      <view wx:if="{{state_left && Isleftcardchosed == false}}">
+        <text class="action_text">请在桌面上选择一张牌</text></view>
+      <!-- 如果用户选择了一张剩余的牌，显示"确认"按钮，以进入下一个步骤，将用户摸到的牌放在list中 -->
+      <view wx:elif="{{state_left && Isleftcardchosed == true}}">
+        <text class="action_text">确定选择这张牌吗</text>
+        <button id="Chooseleftcard">确定</button></view>
+    </view>
+
+    <!-- 如果其他玩家有立牌 -->
+    <view wx:if="Havecardsstanded">
+      <!-- 提示用户选择一张立牌 -->
+      <view wx:if="{{state_standed && Isstandedcardchose == false}}">
+          <text class="action_text">请在其他玩家的立牌中选择一张</text></view>
+      <!-- 如果用户选择了一张立牌，显示可以猜测的牌面 -->
+      <view style="margin-left: 15rpx;"
+      wx:if="{{state_standed && Isstandedcardchose == true}}">
+          <view class="cards_rowdisplay">
+            <cover-view class="cards_view" wx:for="{{white_wait}}">
+              <button id="cards{{item}}" class="cards_button">
+                <cover-image class="cards_image"
+                src="/images/{{item}}.jpg" 
+                mode="aspectFit"></cover-image>
+              </button>
+            </cover-view>
+          </view>
+          <view class="cards_rowdisplay">
+            <cover-view class="cards_view" wx:for="{{black_wait}}">
+              <button id="cards{{item}}" class="cards_button">
+                <cover-image class="cards_image"
+                src="/images/{{item}}.jpg" 
+                mode="aspectFit"></cover-image>
+              </button>
+            </cover-view>
+          </view>
+      </view>
+    </view>
+
+    <!-- 如果猜对的话，即state_judge为true，则用户选择是否继续猜牌 -->
+    <view wx:if="{{state_judge && Isjudgeright == true}}">
+      <text class="action_text"> 恭喜！你猜对了！！</text>
+      <button>继续猜牌</button>
+      <button>结束猜牌</button>
+    </view>
+    <!-- 如果猜错，则显示猜测错误 -->
+    <view wx:elif="{{state_judge && Isjudgeright == false}}">
+      <text class="action_text"> 真可惜！你猜错了( ╯□╰ )！</text>
+    </view>
+  </view>
+</view>
+

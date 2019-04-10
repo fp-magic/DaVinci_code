@@ -1,1 +1,94 @@
-/* pages/game/game.wxss */
+page{
+  height: 100%;
+}
+
+.game_body{
+  /* position: relative; */
+  width: 100%;
+  height: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cards_rowdisplay{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.cards_columndisplay{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.cards_view{
+  width: 55rpx;
+  height: 77rpx;
+}
+.cards_button{
+  width: 55rpx;
+  height: 77rpx;
+}
+.cards_image{
+  width: 55rpx;
+  height: 77rpx;
+}
+
+.player_avatar{
+  width: 60rpx;
+  height: 60rpx;
+}
+.player_nickname{
+  font-size: 30rpx;
+  line-height: 42rpx;
+}
+
+.player_info{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.other_cards{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.middle{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.player1_cards{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.player3_cards{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.player4_cards{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.player2_cards{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.operations{
+  margin-top: 20rpx;
+}
+.action_text{
+  font-size: 40rpx;
+  line-height: 56rpx;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+}

@@ -1,4 +1,33 @@
 Page({
+  data: {
+    player1_cards: ["white1", "black1", "white5"],
+    player2_cards: ["white2", "black2", "white6"],
+    player3_cards: ["white3", "black3", "white7"],
+    player4_cards: ["white4", "black4", "white8", "black10", "black11"],
+    player1_avatar: "/images/头像.jpg",
+    player2_avatar: "/images/头像.jpg",
+    player3_avatar: "/images/头像.jpg",
+    player4_avatar: "/images/头像.jpg",
+    player1_nickname: "I'mPlayer1",
+    player2_nickname: "I'mPlayer2",
+    player3_nickname: "I'mPlayer3",
+    player4_nickname: "I'mPlayer4",
+
+    white_left: ["white0", "white9", "white10", "white11", "whitejoker"],
+    white_wait: ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "whitejoker"],
+    black_left: ["black0", "black5", "black6", "black7", "black8", "black9", "blackjoker"],
+    black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker",],
+
+    Ismyturn: true,
+    Havecardsleft: true,
+    Isleftcardchosed: true,
+    Havecardsstanded: true,
+    Isstandedcardchose: true,
+    Isjudgeright: true,
+    state_left: false,
+    state_standed: false,
+    state_judge: true,
+  },
   onLoad(nowPage) {
     this.setData({
         title: nowPage.title,
