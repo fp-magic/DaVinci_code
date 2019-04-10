@@ -45,5 +45,30 @@ Page({
       userInfo: e.detail.userInfo,
       hasUserInfo: true
     })
+  },
+  mode1tap: function(e) {
+    wx.navigateTo({
+      url: '../game/game'
+    })
+  },
+  mode2tap: function (e) {
+    wx.navigateTo({
+      url: '../game/game'
+    })
+  },
+  rankingtap: function (e) {
+    wx.navigateTo({
+      url: '../ranking/ranking'
+    })
+  },
+  optiontap: function (e) {
+    wx.navigateTo({
+      url: '../option/option'
+    })
+  },
+  tutorialtap: function (e) {
+    wx.navigateTo({
+      url: '../tutorial/tutorial'
+    })
   }
 })

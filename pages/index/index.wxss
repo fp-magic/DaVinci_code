@@ -19,3 +19,69 @@
 .usermotto {
   margin-top: 200px;
 }
+
+.page {
+  display:flex;
+  flex-direction:column;
+}
+
+.title {
+  display:flex;
+  justify-content:center;
+  font-size:30px;
+}
+
+.placeholder {
+  height:130px;
+}
+
+.gamemode {
+  display:flex;
+  flex-direction:row;
+}
+
+.gamemodebutton {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100px;
+  width:100px;
+}
+
+.menu {
+  display:flex;
+  flex-direction:row;
+}
+
+.rankingbutton {
+  background-size: 48px 48px;
+  background-repeat:no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:48px;
+  width:48px;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAlUlEQVRoge3asQnDMBRFUW9hMoL0XuGZ0mqC9Ml6WSkuXVkQUHgyuRd+K/5BlUDLQkeSmqRnb0opt/Sep0l62/70RtKW3vM0AOkApAOQDkA6AOkApAOQDkC6UQBJzfarNz952Q0EZG4SAAAAAP4UYPtea330xvY6LWC2qwcAAAAAAAAAAAAAAACAbwBNAz5pzHbOJdoBdy4EFTphKeoAAAAASUVORK5CYII=");
+}
+
+.optionbutton {
+  background-size: 48px 48px;
+  background-repeat:no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:48px;
+  width:48px;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAChUlEQVRoge1a23GrMBBVCSlBn2LO+XAJlOAOTAnpIHSQdIA7wB1AB3EHdgemg9yPCF2iYJAW+YJn7s7sH7N79qnVCqUSEYAPkl8hDOAjld5kFAq+57Xx/iBjjI41wBij18btiGQeawDJfG3cjgC8xhoA4HVt3I5IloIIlGvjdkSyFRjQPgyQ1vqFZE3yba7YsizbC8D3aVRMyTbGaADvJOuooifZeMpqAIfhNwB2I99JuAGw82QfRmQ3QeBnPHoDUAGoEgD3o1FZb9+kEeutv6QGl9DIi9b6ZSp1JN3kX3M5Ct4W7t3wbYlHCxrAcW1gEVz7qSMZBdbmfGhA8wAFLYCjjWxLskspH8AlufcBXKdaHYACwDWhvqIfhRd7B8BxssUNmkWieutcMdsj+7wE/BzwlE0DwPmXs6SeAXAN8fydSESn0+x1FEARnYdCitTVBetieGF3UvBKucMz1FG7eYk/jQgR3C4xwOoJuktIBC/PxwAKrbv/BjxVCkUU8S2BAUETcHAH2nAb/SL5NiewihT4d6iKJHuQXWL1kax/HZx2lPgUCOuNqGINWHKvBvDpzgU7zC2+iYUaYT0vBj+sP2OMXrTXGUsnf/3ief2QcmmQZdm+F5xsRu+9w+99z7tdlTQpouxx6zzDZ79S2iicNgAqiEfvH5JHipW4u7sn5TMvtgYtLnVBp0yd613wg1qYOt67waokNbijfemcWjDkswbYVGo94Sd/5uF355I8bPjc+jmdZdl+pKm0QeCVcqPFiWQ597AgeR8bOKaYkm0bSwngJFkcBJNkJQPg/DBAsSRcx2zntZ6C9rupZ1bhQJivjdsRBbPUpn41UOrJf/ZQKq6QUxbwH8QtvLnnv5lOAAAAAElFTkSuQmCC");
+}
+
+.tutorialbutton {
+  background-size: 48px 48px;
+  background-repeat:no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:48px;
+  width:48px;
+  background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAACXElEQVRogc2a0ZXiMAxFbwkpISVQAh1sOlh3MHRAOlg6mHSw6YB0wHRAOiAdZD/szDIB28iWAZ3z+AAkvSfJsRMAHauB38Af4AicgXmFs/tsD/wCKqXcyVYBH8CJW7KP4oQV/lQxNfAJXDKIr3HBdqa4kL0y8XtCPkoQ35A3KimjVWuRN5SteqgbjQb5ZxNfw7yC/AAcgNahA76eKSKF/EC85bUTkyLi4XHaIJv5SRL8KsckFHDhwYUtudpMjkyKVQkiTrGgrTDgNpH8YlthvhnY+YLVyEanyyS/WCcUcMGzY0sD1QFSG+AvtuVnwseEjTDvjJ2UH1Yhq/4YIL/1+BwDPikL+kdBdsIAXYDMMeDnW/CDMP/Mam+QnnNaD5E64udbgH2CgO+OxpJKiDQRP99+0SVwmHFjZBIcT64Ca5wDPqOHPBG/aEEOic5SbD3kU65CC1pIW0BSGA95CC/6GHpIb58G+c/M2AOFyR8Kkp+xxS9G/itAvlXMU0zA1kPeKOcpQn7wkK/Rvb8ecS/aAoxHQFeiUEMBAb4zz1k5Tw+6C2qBz7TztBA/v7yzgAbsgUg78N6DYoXKeWbzKvTXAswbEJLCXAtIecQRQuuBVvyJO/fYmgl8plmgG9PsQkkBd6u/mPTm/hUCTCA+oHNFKiVgiJEHe+DKHaUSAoKjs7bc3XnvQU5M8UNkk5lQE0ZK/p1EJJNfrEF3k3sUOb893FjNc89LA4V+9N5RthsTCiMTswq7lWsKmVzMp/5nosJWa8gg3rsYb/HPlQZbxR4rauQ/0dG917vvNCiR/gfTWwaKwzxvPAAAAABJRU5ErkJggg==");
+}
