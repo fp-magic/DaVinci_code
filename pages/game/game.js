@@ -1,9 +1,6 @@
 Page({
   data: {
-    player1_cards: ["white1", "black1", "white5"],
-    player2_cards: ["white2", "black2", "white6"],
-    player3_cards: ["white3", "black3", "white7"],
-    player4_cards: ["white4", "black4", "white8", "black10", "black11"],
+
     player1_avatar: "/images/头像.jpg",
     player2_avatar: "/images/头像.jpg",
     player3_avatar: "/images/头像.jpg",
@@ -13,8 +10,9 @@ Page({
     player3_nickname: "I'mPlayer3",
     player4_nickname: "I'mPlayer4",
 
-    white_left: ["white0", "white9", "white10", "white11", "whitejoker"],
+
     white_wait: ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "whitejoker"],
+<<<<<<< HEAD
     black_left: ["black0", "black5", "black6", "black7", "black8", "black9", "blackjoker"],
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker",],
     cards_dict: {
@@ -23,21 +21,27 @@ Page({
       "black0": true, "black1": true, "black2": true, "black3": true, "black4": true, "black5": true, "black6": true,
       "black7": true, "black8": true, "black9": true, "black10": true, "black11": true, "blackjoker": true
     },
+=======
+
+    black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker", ],
+>>>>>>> 4785b220053a913cb6db83df5bcc04a2bc6cd7e4
 
     Ismyturn: true,
     Havecardsleft: true,
     Isleftcardchosed: true,
-    Havecardsstanded: true,
+    Havecardsstanded: gameStatus,
     Isstandedcardchose: true,
     Isjudgeright: true,
     state_left: false,
     state_standed: false,
     state_judge: true,
   },
+  /*刷新牌组显示
+   */
+  
   onLoad(nowPage) {
     this.setData({
         title: nowPage.title,
-        player0card0: player0.cardIndexToString[0]
       }),
       beginTime = 2
     showTime = 10
@@ -47,32 +51,57 @@ Page({
     gameStatus = 0
     guessStatus = 0
     aiMode = "freshman"
+    cardNameForBind = ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"]
     changeState()
-    cardArray = shuffleSwap(createArray(24)) //洗牌
-    console.log(cardArray)
+    
+    console.log(cardNameForBind)
+    cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
+    cardArrayWhiteForBind = countForBind(cardArrayWhite)
+    cardArrayBlack = shuffleSwap(createArray(12))
+    for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
+    cardArrayBlackForBind = countForBind(cardArrayBlack)
+    console.log(cardArrayWhite, cardArrayBlack)
     console.log(player1)
     if (playerNum == 4) { //发牌
-      for (var i = 0; i < 3; i++) player0.getCard()
-      for (var i = 0; i < 3; i++) player1.getCard()
-      for (var i = 0; i < 3; i++) player2.getCard()
-      for (var i = 0; i < 3; i++) player3.getCard()
+      for (let i = 0; i < 3; i++) player0.getCard(0)
+      for (let i = 0; i < 3; i++) player1.getCard(0)
+      for (let i = 0; i < 3; i++) player2.getCard(0)
+      for (let i = 0; i < 3; i++) player3.getCard(0)
     }
     player0.setLoc(0)
     player1.setLoc(1)
     player2.setLoc(2)
     player3.setLoc(3)
-    this.setData({
-      player0card0: player0.cardIndexToString[0]
-    })
     console.log(player1)
     gameStatus = 1
+    this.setData({
+      player1_cards: player0.cardIndexForBind,
+      player2_cards: player1.cardIndexForBind,
+      player3_cards: player2.cardIndexForBind,
+      player4_cards: player3.cardIndexForBind,
+      white_left: cardArrayWhiteForBind,
+      black_left: cardArrayBlackForBind
+    })
 
   },
   canvasIdErrorCallback(e) {
     console.error(e.detail.errMsg)
   },
+  refreshCardBind: function (e) {
+    var that=this
+    var i = setInterval(function () {
+      that.setData({
+        player1_cards: player0.cardIndexForBind,
+        player2_cards: player1.cardIndexForBind,
+        player3_cards: player2.cardIndexForBind,
+        player4_cards: player3.cardIndexForBind,
+        white_left: cardArrayWhiteForBind,
+        black_left: cardArrayBlackForBind
+      })
+    }, 100)
+  },
   onReady(e) {
-
+    this.refreshCardBind()
   },
   headerTouchStart: function(e) {
     beginTime = e.timeStamp
@@ -115,7 +144,7 @@ Page({
       player0.failJudge()
     }
     guessStatus = 2
-    player0.guessed=true
+    player0.guessed = true
   }
 })
 let beginTime, showTime //进入时间,倒计时用时间
@@ -133,12 +162,16 @@ let aiMode //ai智商
  **4/5/6/7/8/9用于表示其他人状态，偶数表示猜牌中，奇数表示猜牌结束
  **偶数表示正常，奇数表示在猜牌
  */
-let cardArray = new Array() //总牌组
+let cardArrayWhite = new Array() //总牌组
+let cardArrayBlack = new Array() //总牌组
+let cardArrayWhiteForBind = new Array()
+let cardArrayBlackForBind = new Array()
 const app = getApp()
 let player0 = new player()
 let player1 = new player()
 let player2 = new player()
 let player3 = new player()
+let cardNameForBind = new Array(24)
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
@@ -168,13 +201,12 @@ function changeState() {
     guessStatus -= 1
   } else {
     if (playerNum == 4) {
-      if(gameStatus==3){       
-      }
+      if (gameStatus == 3) {}
       if (gameStatus == 5) {
         player1.aiController()
-      } else if (gameStatus == 7){
+      } else if (gameStatus == 7) {
         player2.aiController()
-      }else if (gameStatus == 9){
+      } else if (gameStatus == 9) {
         player3.aiController()
       }
     } else {
@@ -185,25 +217,43 @@ function changeState() {
     if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
       gameStatus += 1
       if (gameStatus == 3) {
-        player0.getCard()
+        console.log(player0.gotCard)
+        if (!player0.gotCard) {
+          player0.getCard(0)
+        }
+        player0.gotCard = false
         player0.guessed = false
       } else if (gameStatus == 5) {
-        player1.getCard()
+        if (!player1.gotCard) {
+          player1.getCard(0)
+        }
+        player1.gotCard = false
         player1.guessed = false
       } else if (gameStatus == 7) {
-        player2.getCard()
+        if (!player2.gotCard) {
+          player2.getCard(0)
+        }
+        player2.gotCard = false
         player2.guessed = false
       } else if (gameStatus == 9) {
-        player3.getCard()
+        if (!player3.gotCard) {
+          player3.getCard(0)
+        }
+        player3.gotCard = false
         player3.guessed = false
       }
       showTime = playTime
     } else {
-      if(cardArray.length<=0)gameStatus=0
-      console.log(cardArray)
+      if (cardArrayWhite.length <= 0 && cardArrayBlack.length <= 0) gameStatus = 0
+      console.log(cardArrayWhite, cardArrayBlack)
       if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
-        if (gameStatus == 3) {
-          if(!player0.guessed){
+        if (gameStatus == 1) {
+          player0.setGotCard(false)
+          player1.setGotCard(false)
+          player2.setGotCard(false)
+          player3.setGotCard(false)
+        } else if (gameStatus == 3) {
+          if (!player0.guessed) {
             player0.failJudge()
           }
         } else if (gameStatus == 5) {
@@ -241,7 +291,7 @@ function changeState() {
  */
 function player() {
   this.cardIndex = new Array()
-  this.cardIndexToString = new Array()
+  this.cardIndexForBind = new Array()
   this.cardVisible = new Array()
   this.playerState = 0
   this.playerName = "jack"
@@ -249,6 +299,7 @@ function player() {
   this.lastCardIndex = 0
   this.playerLoc = 0
   this.guessed = true
+  this.gotCard = false
 }
 /*设置姓名
  */
@@ -260,12 +311,30 @@ player.prototype.setName = function(newName) {
 player.prototype.setLoc = function(newLoc) {
   this.playerLoc = newLoc
 }
-/*抽一张牌
+/*设置gotCard
  */
-player.prototype.getCard = function() {
-  if (cardArray.length <= 0) return
-  this.lastCardIndex = cardArray.pop()
+player.prototype.setGotCard = function(ifGotCard) {
+  this.gotCard = ifGotCard
+}
+/*抽一张牌
+ **0:随机;1:white;2:black
+ */
+player.prototype.getCard = function(getCardMod) {
+  if (cardArrayWhite.length <= 0 && cardArrayWhite.length <= 0) return
+  if (getCardMod != 1 && getCardMod != 2) {
+    getCardMod = Math.floor(Math.random() * (2)) + 1
+  }
+  if (getCardMod == 1 && cardArrayWhite.length <= 0) getCardMod = 2
+  if (getCardMod == 2 && cardArrayBlack.length <= 0) getCardMod = 1
+  if (getCardMod == 1) {
+    this.lastCardIndex = cardArrayWhite.pop()
+    cardArrayWhiteForBind = countForBind(cardArrayWhite)
+  } else {
+    this.lastCardIndex = cardArrayBlack.pop()
+    cardArrayBlackForBind = countForBind(cardArrayBlack)
+  }
   this.cardIndex.push(this.lastCardIndex)
+  this.cardIndexForBind = countForBind(this.cardIndex)
   this.cardVisible.push(false)
   this.cardNum = this.cardNum + 1
   for (let i = 0; i < this.cardNum; i++) { //保持降序，牌数较少就直接冒泡排了
@@ -280,9 +349,9 @@ player.prototype.getCard = function() {
       }
     }
   }
-  for (let i = 0; i < this.cardNum; i++) {
-    this.cardIndexToString[i] = this.cardIndex[i].toString()
-  }
+  console.log(this.cardIndex, this.cardIndexForBind)
+  this.gotCard = true
+  this.cardIndexForBind = countForBind(this.cardIndex)
 }
 /*被猜牌
  **guessCardLoc:被猜的牌的位置编号
@@ -346,6 +415,16 @@ player.prototype.aiController = function() {
     }
     console.log(guessCons, guessPlayerLoc, guessCardLoc, guessCardIndex)
     guessStatus = 2
-    this.guessed=true
+    this.guessed = true
   }
+}
+/*输入一个牌组数组，返回对应的用于数据绑定的数组
+ */
+function countForBind(oneCardArray) {
+  let oneCardArrayForBind = new Array(oneCardArray.length)
+  for (let i = 0; i < oneCardArray.length; i++) {
+    oneCardArrayForBind[i] = cardNameForBind[oneCardArray[i]]
+  }
+  console.log(oneCardArrayForBind)
+  return oneCardArrayForBind
 }

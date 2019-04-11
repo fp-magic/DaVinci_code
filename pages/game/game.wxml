@@ -71,9 +71,9 @@
         </cover-view>
       </view>
 
-      <view id="player3_info" class="player_info">
+      <view id="player4_info" class="player_info">
         <image class="player_avatar"
-        src="{{player3_avatar}}"
+        src="{{player4_avatar}}"
         mode="aspectFit"></image>
         <text class="player_nickname">{{player4_nickname}}</text>
       </view>
@@ -105,7 +105,7 @@
   <!-- 当前玩家进入游戏回合 -->
   <view class="action" wx:if="{{Ismyturn}}">
     <!-- 如果桌面上有剩余的牌 -->
-    <view wx:if="{{Havecardsleft}}">
+    <view wx:if="{{Havecardsleft != 0}}">
       <!-- 提示用户选择一张剩余的牌 -->
       <view wx:if="{{state_left && Isleftcardchosed == false}}">
         <text class="action_text">请在桌面上选择一张牌</text></view>
