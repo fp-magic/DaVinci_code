@@ -40,8 +40,20 @@
     </view>
 
     <view class="other_cards">
+      <!-- 显示白牌的第一列（不超过七张牌） -->
       <view class="cards_columndisplay">
         <cover-view class="cards_view" wx:for="{{white_left}}">
+          <button id="cards{{item}}" class="cards_button" wx:if="{{index<=6}}">
+            <cover-image class="cards_image"
+            src="/images/whiteblank.jpg" 
+            mode="aspectFit"></cover-image>
+          </button>
+        </cover-view>
+      </view>
+      <!-- 如果剩余的白牌超过7张，在第二列中显示剩余所有牌 -->
+      <view class="cards_columndisplay" wx:if="{{white_left[7]!=None}}">
+        <!-- <text>{{white_left[4]}}</text> -->
+        <cover-view class="cards_view" wx:for="{{white_left}}" wx:if="{{index>=7}}">
           <button id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
             src="/images/whiteblank.jpg" 
@@ -49,9 +61,22 @@
           </button>
         </cover-view>
       </view>
+
+      <!-- 显示黑牌的第一列（不超过7张） -->
       <view class="cards_columndisplay">
         <cover-view class="cards_view" wx:for="{{black_left}}">
-          <button id="cards{{item}}" class="cards_button">
+          <button id="cards{{item}}" class="cards_button" wx:if="{{index <= 6}}">
+            <cover-image class="cards_image"
+            src="/images/blackblank.jpg" 
+            mode="aspectFit"></cover-image>
+          </button>
+        </cover-view>
+      </view>
+
+      <!-- 如果剩余的白牌超过7张，在第二列中显示剩余所有牌 -->
+      <view class="cards_columndisplay" wx:if="{{black_left[7]!=None}}">
+        <cover-view class="cards_view" wx:for="{{black_left}}" wx:if="{{index>=7}}">
+          <button  id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
             src="/images/blackblank.jpg" 
             mode="aspectFit"></cover-image>
@@ -71,9 +96,9 @@
         </cover-view>
       </view>
 
-      <view id="player4_info" class="player_info">
+      <view id="player3_info" class="player_info">
         <image class="player_avatar"
-        src="{{player4_avatar}}"
+        src="{{player3_avatar}}"
         mode="aspectFit"></image>
         <text class="player_nickname">{{player4_nickname}}</text>
       </view>
@@ -105,7 +130,7 @@
   <!-- 当前玩家进入游戏回合 -->
   <view class="action" wx:if="{{Ismyturn}}">
     <!-- 如果桌面上有剩余的牌 -->
-    <view wx:if="{{Havecardsleft != 0}}">
+    <view wx:if="{{Havecardsleft}}">
       <!-- 提示用户选择一张剩余的牌 -->
       <view wx:if="{{state_left && Isleftcardchosed == false}}">
         <text class="action_text">请在桌面上选择一张牌</text></view>
