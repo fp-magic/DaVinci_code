@@ -17,6 +17,12 @@ Page({
     white_wait: ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "whitejoker"],
     black_left: ["black0", "black5", "black6", "black7", "black8", "black9", "blackjoker"],
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker",],
+    cards_dict: {
+      "white0": true, "white1": true, "white2": true, "white3": true, "white4": true, "white5": true, "white6": true,
+      "white7": true, "white8": true, "white9": true, "white10": true, "white11": true, "whitejoker": true,
+      "black0": true, "black1": true, "black2": true, "black3": true, "black4": true, "black5": true, "black6": true,
+      "black7": true, "black8": true, "black9": true, "black10": true, "black11": true, "blackjoker": true
+    },
 
     Ismyturn: true,
     Havecardsleft: true,

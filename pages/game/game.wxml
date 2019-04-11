@@ -6,7 +6,7 @@
         <button id="cards{{item}}" class="cards_button">
           <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理 -->
           <cover-image class="cards_image"
-          src="/images/{{item[0]=='w'?'whiteback':'blackback'}}.jpg" 
+          src="/images/{{cards_dict[item]==true? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg" 
           mode="aspectFit"></cover-image>
         </button>
       </cover-view>
@@ -32,7 +32,7 @@
           <cover-view class="cards_view" wx:for="{{player2_cards}}">
             <button id="cards{{item}}" class="cards_button">
               <cover-image class="cards_image"
-              src="/images/{{item[0]=='w'?'whiteback':'blackback'}}.jpg"
+              src="/images/{{cards_dict[item]==true? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
               mode="aspectFit"></cover-image>
             </button>
           </cover-view>
@@ -65,7 +65,7 @@
         <cover-view class="cards_view" wx:for="{{player4_cards}}">
           <button id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
-            src="/images/{{item[0]=='w'?'whiteback':'blackback'}}.jpg"
+            src="/images/{{cards_dict[item]==true? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
             mode="aspectFit"></cover-image>
           </button>
         </cover-view>
@@ -154,6 +154,6 @@
     <view wx:elif="{{state_judge && Isjudgeright == false}}">
       <text class="action_text"> 真可惜！你猜错了( ╯□╰ )！</text>
     </view>
+
   </view>
 </view>
-
