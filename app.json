@@ -5,7 +5,8 @@
     "pages/game/game",
     "pages/tutorial/tutorial",
     "pages/option/option",
-    "pages/ranking/ranking"
+    "pages/ranking/ranking",
+    "pages/GroupTeam/GroupTeam"
   ],
   "window": {
     "backgroundTextStyle": "light",
