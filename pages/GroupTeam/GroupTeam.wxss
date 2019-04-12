@@ -1,0 +1,27 @@
+page
+{
+  background-color: papayawhip;
+}
+.choose{
+    margin-left: 50rpx;
+  margin-top: 400rpx;
+  margin-right: 50rpx;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.choose_image1{
+  width: 210rpx;
+  height: 210rpx;
+}
+
+ .choose_image2{
+  width: 210rpx;
+  height: 210rpx;
+
+}
+
+.choose_button{
+  background-color:papayawhip;
+}

@@ -1,0 +1,21 @@
+<view class="choose">
+  <cover-view class="friend_magin1">
+    <button id="choose_type" class="choose_button">
+      <!-- 好友对战 -->
+      <cover-image class="choose_image1"
+      src="/image/cycle.png"
+      mode="aspectFit">
+      </cover-image>
+    </button>
+  </cover-view>
+
+  <cover-view class="friend_magin2">
+    <button id="choose_type" class="choose_button">
+      <!-- 在线匹配 -->
+      <cover-image class="choose_image2"
+      src="/image/cycle1.png"
+      mode="aspectFit">
+      </cover-image>
+    </button>
+  </cover-view>
+ </view>
