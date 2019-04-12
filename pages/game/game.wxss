@@ -29,6 +29,10 @@ page{
   width: 55rpx;
   height: 77rpx;
 }
+.cards_button_click{
+  width: 85rpx;
+  height: 97rpx;
+}
 .cards_image{
   width: 55rpx;
   height: 77rpx;

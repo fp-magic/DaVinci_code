@@ -1,15 +1,17 @@
 <view class="game_body">
-  <button>{{cards_dict[player3_cards[0]]}}</button><!--临时用于调试-->
   <view class="player3_cards">
     <view class="cards_rowdisplay">
-      <cover-view class="cards_view" wx:for="{{player3_cards}}">
-        <button id="cards{{item}}" class="cards_button" bindtouchend="cardTouchEnd">
-          <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理 -->
-          <cover-image class="cards_image"
-          src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg" 
-          mode="aspectFit"></cover-image>
-        </button>
-      </cover-view>
+      <view wx:for="{{player3_cards}}">
+        <cover-view class="cards_view">
+          <button id="cards{{item}}" class="{{Isselect==item?cards_button_click: cards_button}}" bindtouchend="cardTouchEnd">
+            <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"  -->
+            <cover-image class="cards_image"
+            src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
+            mode="aspectFit"></cover-image>
+          </button>
+        </cover-view>
+      </view>
+      
     </view>
 
     <view id="player3_info" class="player_info">
@@ -31,9 +33,8 @@
       <view class="cards_columndisplay">
           <cover-view class="cards_view" wx:for="{{player2_cards}}">
             <button id="cards{{item}}" class="cards_button" bindtouchend="cardTouchEnd">
-             
               <cover-image class="cards_image"
-              src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
+              src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
               mode="aspectFit"></cover-image>
             </button>
           </cover-view>
@@ -46,7 +47,7 @@
         <cover-view class="cards_view" wx:for="{{white_left}}">
           <button id="cards{{item}}" class="cards_button" wx:if="{{index<=6}}">
             <cover-image class="cards_image"
-            src="/images/whiteblank.jpg" 
+            src="{{cards_imageURL['whiteblank']}}"
             mode="aspectFit"></cover-image>
           </button>
         </cover-view>
@@ -57,7 +58,7 @@
         <cover-view class="cards_view" wx:for="{{white_left}}" wx:if="{{index>=7}}">
           <button id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
-            src="/images/whiteblank.jpg" 
+            src="{{cards_imageURL['whiteblank']}}"
             mode="aspectFit"></cover-image>
           </button>
         </cover-view>
@@ -68,18 +69,18 @@
         <cover-view class="cards_view" wx:for="{{black_left}}">
           <button id="cards{{item}}" class="cards_button" wx:if="{{index <= 6}}">
             <cover-image class="cards_image"
-            src="/images/blackblank.jpg" 
+            src="{{cards_imageURL['blackblank']}}"
             mode="aspectFit"></cover-image>
           </button>
         </cover-view>
       </view>
 
-      <!-- 如果剩余的白牌超过7张，在第二列中显示剩余所有牌 -->
+      <!-- 如果剩余的黑牌超过7张，在第二列中显示剩余所有牌 -->
       <view class="cards_columndisplay" wx:if="{{black_left[7]!=None}}">
         <cover-view class="cards_view" wx:for="{{black_left}}" wx:if="{{index>=7}}">
           <button  id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
-            src="/images/blackblank.jpg" 
+            src="{{cards_imageURL['blackblank']}}"
             mode="aspectFit"></cover-image>
           </button>
         </cover-view>
@@ -91,7 +92,7 @@
         <cover-view class="cards_view" wx:for="{{player4_cards}}" bindtouchend="cardTouchEnd">
           <button id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
-            src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
+            src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
             mode="aspectFit"></cover-image>
           </button>
         </cover-view>
@@ -118,7 +119,7 @@
       <cover-view class="cards_view" wx:for="{{player1_cards}}"  bindtouchend="cardTouchEnd">
         <button id="cards{{item}}" class="cards_button">
           <cover-image class="cards_image"
-          src="/images/{{item}}.jpg" 
+          src="{{cards_imageURL[item]}}"
           mode="aspectFit"></cover-image>
         </button>
       </cover-view>
@@ -135,7 +136,7 @@
       <!-- 提示用户选择一张剩余的牌 -->
       <view wx:if="{{state_left && Isleftcardchosed == false}}">
         <text class="action_text">请在桌面上选择一张牌</text></view>
-      <!-- 如果用户选择了一张剩余的牌，显示"确认"按钮，以进入下一个步骤，将用户摸到的牌放在list中 -->
+      <!-- 如果用户选择了一张剩余的牌，显示"确认"按钮，等用户点击确定按钮之后，再进入下一个步骤，将用户摸到的牌放在list中 -->
       <view wx:elif="{{state_left && Isleftcardchosed == true}}">
         <text class="action_text">确定选择这张牌吗</text>
         <button id="Chooseleftcard">确定</button></view>
@@ -146,7 +147,7 @@
       <!-- 提示用户选择一张立牌 -->
       <view wx:if="{{state_standed && Isstandedcardchose == false}}">
           <text class="action_text">请在其他玩家的立牌中选择一张</text></view>
-      <!-- 如果用户选择了一张立牌，显示可以猜测的牌面 -->
+      <!-- 如果用户选择了一张立牌，显示可以猜测的牌面，等用户点击了牌面后，进入下一个游戏步骤 -->
       <view style="margin-left: 15rpx;"
       wx:if="{{state_standed && Isstandedcardchose == true}}">
           <view class="cards_rowdisplay">

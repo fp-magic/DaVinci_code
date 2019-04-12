@@ -16,6 +16,49 @@ Page({
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker",],
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker", ],
 
+    cards_imageURL: {
+      "black0": "https://i.postimg.cc/bwvNzMjJ/black0.jpg",
+      "black1": "https://i.postimg.cc/XYDNX8Vg/black1.jpg",
+      "black2": "https://i.postimg.cc/CKXKr4XK/black2.jpg",
+      "black3": "https://i.postimg.cc/qvtVDdT8/black3.jpg",
+      "black4": "https://i.postimg.cc/pLBGBG9D/black4.jpg",
+      "black5": "https://i.postimg.cc/rsWgRQXR/black5.jpg",
+      "black6": "https://i.postimg.cc/76jmLjcy/black6.jpg",
+      "black7": "https://i.postimg.cc/vmq0J4tT/black7.jpg",
+      "black8": "https://i.postimg.cc/638MtBM0/black8.jpg",
+      "black9": "https://i.postimg.cc/D0dLKD36/black9.jpg",
+      "black10": "https://i.postimg.cc/jdcPgGXd/black10.jpg",
+      "black11": "https://i.postimg.cc/fRbX6B27/black11.jpg",
+      "blackback": "https://i.postimg.cc/KcnnLK3T/blackback.jpg",
+      "blackblank": "https://i.postimg.cc/L80fRLwc/blackblank.jpg",
+      "blackjoker": "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
+
+      "white0": "https://i.postimg.cc/nLH5bb8R/white0.jpg",
+      "white1": "https://i.postimg.cc/QtCyCQdc/white1.jpg",
+      "white2": "https://i.postimg.cc/5N8bfVGb/white2.jpg",
+      "white3": "https://i.postimg.cc/252tCcrz/white3.jpg",
+      "white4": "https://i.postimg.cc/7PFqv6KK/white4.jpg",
+      "white5": "https://i.postimg.cc/sfQ30S4B/white5.jpg",
+      "white6": "https://i.postimg.cc/tJVvt9PT/white6.jpg",
+      "white7": "https://i.postimg.cc/G2fSy44V/white7.jpg",
+      "white8": "https://i.postimg.cc/nMbR3NY1/white8.jpg",
+      "white9": "https://i.postimg.cc/W1jj3yLr/white9.jpg",
+      "white10": "https://i.postimg.cc/0yfvJCP4/white10.jpg",
+      "white11": "https://i.postimg.cc/HLkg07Lk/white11.jpg",
+      "whiteback": "https://i.postimg.cc/FKCQTsfg/whiteback.jpg",
+      "whiteblank": "https://i.postimg.cc/SsXb3FC0/whiteblank.jpg",
+      "whitejoker": "https://i.postimg.cc/vBpwdqt4/whitejoker.jpg",
+
+      "option": "https://i.postimg.cc/ncwwrHRN/option.png",
+      "picture-black": "https://i.postimg.cc/rmJfkcRn/picture-black.jpg",
+      "ranking": "https://i.postimg.cc/sgQHZtbx/ranking.png",
+      "ranking1": "https://i.postimg.cc/SxBTLgpr/ranking1.jpg",
+      "ranking2": "https://i.postimg.cc/HnkBWKQp/ranking2.jpg",
+      "ranking3": "https://i.postimg.cc/KzF0w4j3/ranking3.jpg",
+      "tutorial": "https://i.postimg.cc/0N7tV7kq/tutorial.png",
+    },
+
+    Isselect: "white0",
     Ismyturn: true,
     Havecardsleft: true,
     Isleftcardchosed: true,
@@ -145,7 +188,7 @@ let player1 = new player()
 let player2 = new player()
 let player3 = new player()
 let cardNameForBind = new Array(24)
-let cardVisibleDict = new Array()
+let cardVisibleDict = new Object()
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
