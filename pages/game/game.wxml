@@ -1,17 +1,14 @@
 <view class="game_body">
   <view class="player3_cards">
     <view class="cards_rowdisplay">
-      <view wx:for="{{player3_cards}}">
-        <cover-view class="cards_view">
-          <button id="cards{{item}}" class="{{Isselect==item?cards_button_click: cards_button}}" bindtouchend="cardTouchEnd">
-            <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"  -->
-            <cover-image class="cards_image"
-            src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
-            mode="aspectFit"></cover-image>
-          </button>
-        </cover-view>
-      </view>
-      
+      <cover-view class="cards_view" wx:for="{{player3_cards}}">
+        <button id="player3{{item}}" class="{{Isselect==item?cards_button_click: cards_button}}" bindtouchend="cardTouchEnd">
+          <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"  -->
+          <cover-image class="cards_image"
+          src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
+          mode="aspectFit"></cover-image>
+        </button>
+      </cover-view>
     </view>
 
     <view id="player3_info" class="player_info">
@@ -32,7 +29,8 @@
       </view>
       <view class="cards_columndisplay">
           <cover-view class="cards_view" wx:for="{{player2_cards}}">
-            <button id="cards{{item}}" class="cards_button" bindtouchend="cardTouchEnd">
+            <button id="player2{{item}}" class="cards_button" bindtouchend="cardTouchEnd">
+
               <cover-image class="cards_image"
               src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
               mode="aspectFit"></cover-image>
@@ -90,7 +88,7 @@
     <view class="player4_cards">
       <view class="cards_columndisplay">
         <cover-view class="cards_view" wx:for="{{player4_cards}}" bindtouchend="cardTouchEnd">
-          <button id="cards{{item}}" class="cards_button">
+          <button id="player4{{item}}" class="cards_button">
             <cover-image class="cards_image"
             src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
             mode="aspectFit"></cover-image>
@@ -116,8 +114,8 @@
     </view>
 
     <view class="cards_rowdisplay">
-      <cover-view class="cards_view" wx:for="{{player1_cards}}"  bindtouchend="cardTouchEnd">
-        <button id="cards{{item}}" class="cards_button">
+      <cover-view class="cards_view" wx:for="{{player1_cards}}">
+        <button id="player1{{item}}" class="cards_button">
           <cover-image class="cards_image"
           src="{{cards_imageURL[item]}}"
           mode="aspectFit"></cover-image>
@@ -149,10 +147,10 @@
           <text class="action_text">请在其他玩家的立牌中选择一张</text></view>
       <!-- 如果用户选择了一张立牌，显示可以猜测的牌面，等用户点击了牌面后，进入下一个游戏步骤 -->
       <view style="margin-left: 15rpx;"
-      wx:if="{{state_standed && Isstandedcardchose == true}}">
+      wx:if="{{Isstandedcardchose == true}}">
           <view class="cards_rowdisplay">
             <cover-view class="cards_view" wx:for="{{white_wait}}">
-              <button id="cards{{item}}" class="cards_button">
+              <button id="{{item}}" class="cards_button" bindtouchend="listSelectEnd">
                 <cover-image class="cards_image"
                 src="/images/{{item}}.jpg" 
                 mode="aspectFit"></cover-image>
@@ -161,7 +159,7 @@
           </view>
           <view class="cards_rowdisplay">
             <cover-view class="cards_view" wx:for="{{black_wait}}">
-              <button id="cards{{item}}" class="cards_button">
+              <button id="{{item}}" class="cards_button" bindtouchend="listSelectEnd">
                 <cover-image class="cards_image"
                 src="/images/{{item}}.jpg" 
                 mode="aspectFit"></cover-image>
@@ -171,16 +169,14 @@
       </view>
     </view>
 
-    <!-- 如果猜对的话，即state_judge为true，则用户选择是否继续猜牌 -->
+    <!-- 如果猜对的话，即state_judge为true-->
     <view wx:if="{{state_judge && Isjudgeright == true}}">
       <text class="action_text"> 恭喜！你猜对了！！</text>
-      <button>继续猜牌</button>
-      <button>结束猜牌</button>
+      <button bindtouchend="endMyTurn">结束猜牌</button>
     </view>
     <!-- 如果猜错，则显示猜测错误 -->
     <view wx:elif="{{state_judge && Isjudgeright == false}}">
       <text class="action_text"> 真可惜！你猜错了( ╯□╰ )！</text>
     </view>
-
   </view>
 </view>
