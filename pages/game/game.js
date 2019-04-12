@@ -15,12 +15,7 @@ Page({
     black_left: ["black0", "black5", "black6", "black7", "black8", "black9", "blackjoker"],
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker",],
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker", ],
-    cards_dict: {
-      "white0": true, "white1": true, "white2": true, "white3": true, "white4": true, "white5": true, "white6": true,
-      "white7": true, "white8": true, "white9": true, "white10": true, "white11": true, "whitejoker": true,
-      "black0": true, "black1": true, "black2": true, "black3": true, "black4": true, "black5": true, "black6": true,
-      "black7": true, "black8": true, "black9": true, "black10": true, "black11": true, "blackjoker": true
-    },
+
     Ismyturn: true,
     Havecardsleft: true,
     Isleftcardchosed: true,
@@ -39,14 +34,17 @@ Page({
         title: nowPage.title,
       }),
       beginTime = 2
-    showTime = 10
-    playTime = 20
-    midTime = 5
+    showTime = 5
+    playTime = 10
+    midTime = 5 
     playerNum = 4
     gameStatus = 0
     guessStatus = 0
     aiMode = "freshman"
     cardNameForBind = ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"]
+    for(let i=0;i<cardNameForBind.length;i++){
+      cardVisibleDict[cardNameForBind[i]]=false
+    }
     changeState()
     
     console.log(cardNameForBind)
@@ -56,7 +54,6 @@ Page({
     for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
     cardArrayBlackForBind = countForBind(cardArrayBlack)
     console.log(cardArrayWhite, cardArrayBlack)
-    console.log(player1)
     if (playerNum == 4) { //发牌
       for (let i = 0; i < 3; i++) player0.getCard(0)
       for (let i = 0; i < 3; i++) player1.getCard(0)
@@ -67,7 +64,6 @@ Page({
     player1.setLoc(1)
     player2.setLoc(2)
     player3.setLoc(3)
-    console.log(player1)
     gameStatus = 1
     this.setData({
       player1_cards: player0.cardIndexForBind,
@@ -75,12 +71,10 @@ Page({
       player3_cards: player2.cardIndexForBind,
       player4_cards: player3.cardIndexForBind,
       white_left: cardArrayWhiteForBind,
-      black_left: cardArrayBlackForBind
+      black_left: cardArrayBlackForBind,
+      cards_dict: cardVisibleDict
     })
 
-  },
-  canvasIdErrorCallback(e) {
-    console.error(e.detail.errMsg)
   },
   refreshCardBind: function (e) {
     var that=this
@@ -91,30 +85,14 @@ Page({
         player3_cards: player2.cardIndexForBind,
         player4_cards: player3.cardIndexForBind,
         white_left: cardArrayWhiteForBind,
-        black_left: cardArrayBlackForBind
+        black_left: cardArrayBlackForBind,
+        cards_dict: cardVisibleDict
+        
       })
     }, 100)
   },
   onReady(e) {
     this.refreshCardBind()
-  },
-  headerTouchStart: function(e) {
-    beginTime = e.timeStamp
-    console.log(e.timeStamp + '- touch start')
-  },
-  headerLongTap: function(e) {
-    console.log(e.timeStamp + '- long tap')
-  },
-  headerTouchEnd: function(e) {
-    if (Math.abs(e.timeStamp - beginTime - 3000) < 200)
-      wx.navigateBack({
-        delta: 1
-      })
-    console.log(e.timeStamp + '- touch end')
-    console.log(e)
-  },
-  headerTap: function(e) {
-    console.log(e.timeStamp + '- tap')
   },
   cardTouchEnd: function(e) { //之后配合前端进行修改
     if (gameStatus != 3) return
@@ -167,6 +145,7 @@ let player1 = new player()
 let player2 = new player()
 let player3 = new player()
 let cardNameForBind = new Array(24)
+let cardVisibleDict = new Array()
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
@@ -212,7 +191,6 @@ function changeState() {
     if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
       gameStatus += 1
       if (gameStatus == 3) {
-        console.log(player0.gotCard)
         if (!player0.gotCard) {
           player0.getCard(0)
         }
@@ -240,7 +218,7 @@ function changeState() {
       showTime = playTime
     } else {
       if (cardArrayWhite.length <= 0 && cardArrayBlack.length <= 0) gameStatus = 0
-      console.log(cardArrayWhite, cardArrayBlack)
+      console.log(cardArrayWhite, cardArrayBlack,cardVisibleDict)
       if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
         if (gameStatus == 1) {
           player0.setGotCard(false)
@@ -334,7 +312,7 @@ player.prototype.getCard = function(getCardMod) {
   this.cardNum = this.cardNum + 1
   for (let i = 0; i < this.cardNum; i++) { //保持降序，牌数较少就直接冒泡排了
     for (let j = i + 1; j < this.cardNum; j++) {
-      if (this.cardIndex[i] % 12 < this.cardIndex[j] % 12 || (this.cardIndex[i] % 12 == this.cardIndex[i] % 12 && this.cardIndex[i] < this.cardIndex[j])) {
+      if (this.cardIndex[i] % 12 < this.cardIndex[j] % 12 || (this.cardIndex[i] % 12 == this.cardIndex[j] % 12 && this.cardIndex[i] < this.cardIndex[j])) {
         let tmp = this.cardIndex[i]
         this.cardIndex[i] = this.cardIndex[j]
         this.cardIndex[j] = tmp
@@ -344,7 +322,7 @@ player.prototype.getCard = function(getCardMod) {
       }
     }
   }
-  console.log(this.cardIndex, this.cardIndexForBind)
+  console.log(this.cardNum,this.cardIndex, this.cardIndexForBind)
   this.gotCard = true
   this.cardIndexForBind = countForBind(this.cardIndex)
 }
@@ -355,6 +333,7 @@ player.prototype.getCard = function(getCardMod) {
 player.prototype.guessedJudge = function(guessCardLoc, guessCardIndex) {
   if (this.cardIndex[guessCardLoc] == guessCardIndex) {
     this.cardVisible[guessCardLoc] = true
+    cardVisibleDict[cardNameForBind[guessCardIndex]]=true
     return true
   }
   return false
@@ -368,8 +347,10 @@ player.prototype.succussJudge = function() {
  */
 player.prototype.failJudge = function() {
   for (let i = 0; i < this.cardNum; i++) {
-    if (this.cardIndex[i] == this.lastCardIndex)
+    if (this.cardIndex[i] == this.lastCardIndex){
       this.cardVisible[i] = true
+      cardVisibleDict[cardNameForBind[this.lastCardIndex]]=true
+    }
   }
   showTime = 1
 }
@@ -420,6 +401,5 @@ function countForBind(oneCardArray) {
   for (let i = 0; i < oneCardArray.length; i++) {
     oneCardArrayForBind[i] = cardNameForBind[oneCardArray[i]]
   }
-  console.log(oneCardArrayForBind)
   return oneCardArrayForBind
 }

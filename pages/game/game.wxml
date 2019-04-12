@@ -1,12 +1,12 @@
 <view class="game_body">
-
+  <button>{{cards_dict[player3_cards[0]]}}</button><!--临时用于调试-->
   <view class="player3_cards">
     <view class="cards_rowdisplay">
       <cover-view class="cards_view" wx:for="{{player3_cards}}">
-        <button id="cards{{item}}" class="cards_button">
+        <button id="cards{{item}}" class="cards_button" bindtouchend="cardTouchEnd">
           <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理 -->
           <cover-image class="cards_image"
-          src="/images/{{cards_dict[item]==true? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg" 
+          src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg" 
           mode="aspectFit"></cover-image>
         </button>
       </cover-view>
@@ -30,9 +30,10 @@
       </view>
       <view class="cards_columndisplay">
           <cover-view class="cards_view" wx:for="{{player2_cards}}">
-            <button id="cards{{item}}" class="cards_button">
+            <button id="cards{{item}}" class="cards_button" bindtouchend="cardTouchEnd">
+             
               <cover-image class="cards_image"
-              src="/images/{{cards_dict[item]==true? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
+              src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
               mode="aspectFit"></cover-image>
             </button>
           </cover-view>
@@ -87,10 +88,10 @@
 
     <view class="player4_cards">
       <view class="cards_columndisplay">
-        <cover-view class="cards_view" wx:for="{{player4_cards}}">
+        <cover-view class="cards_view" wx:for="{{player4_cards}}" bindtouchend="cardTouchEnd">
           <button id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
-            src="/images/{{cards_dict[item]==true? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
+            src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"
             mode="aspectFit"></cover-image>
           </button>
         </cover-view>
@@ -114,7 +115,7 @@
     </view>
 
     <view class="cards_rowdisplay">
-      <cover-view class="cards_view" wx:for="{{player1_cards}}">
+      <cover-view class="cards_view" wx:for="{{player1_cards}}"  bindtouchend="cardTouchEnd">
         <button id="cards{{item}}" class="cards_button">
           <cover-image class="cards_image"
           src="/images/{{item}}.jpg" 
