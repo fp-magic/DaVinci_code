@@ -6,5 +6,10 @@ Page({
   },
   onLoad: function () {
   },
+  friends: function (e) {
+    wx.navigateTo({
+      url: '../invitefriends/invitefriends',
+    })
+  },
 })
 
