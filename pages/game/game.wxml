@@ -1,9 +1,9 @@
 <view class="game_body">
+
   <view class="player3_cards">
     <view class="cards_rowdisplay">
       <cover-view class="cards_view" wx:for="{{player3_cards}}">
         <button id="player3{{item}}" class="{{Isselect==item?cards_button_click: cards_button}}" bindtouchend="cardTouchEnd">
-          <!-- 如果要看player3的牌，把src里的内容改成src="/images/{{item}}.jpg"，其他人同理src="/images/{{cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')}}.jpg"  -->
           <cover-image class="cards_image"
           src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
           mode="aspectFit"></cover-image>
@@ -18,7 +18,7 @@
       <text class="player_nickname">{{player3_nickname}}</text>
     </view>
   </view>
-
+  
   <view class="middle">
     <view class="player2_cards">
       <view id="player2_info" class="player_info">
@@ -27,6 +27,7 @@
         mode="aspectFit"></image>
         <text class="player_nickname">{{player2_nickname}}</text>
       </view>
+
       <view class="cards_columndisplay">
           <cover-view class="cards_view" wx:for="{{player2_cards}}">
             <button id="player2{{item}}" class="cards_button" bindtouchend="cardTouchEnd">
@@ -124,6 +125,21 @@
     </view>
   </view>
 
+  <!-- 倒计时部分, 根据Player_turn指向的不同玩家，在不同的位置显示倒计时 -->
+  <button wx:if="{{Player_turn==1}}" class="time_text" 
+  style="position: absolute; margin-top:760rpx; margin-left:50%;">
+  {{Left_time}}s</button>
+  <button wx:if="{{Player_turn==2}}" class="time_text" 
+  style="position: absolute; margin-top:250rpx; margin-left:15%;">
+  {{Left_time}}s</button>
+  <button wx:if="{{Player_turn==3}}" class="time_text" 
+  style="position: absolute; margin-top:100rpx; margin-left:45%;">
+  {{Left_time}}s</button>
+  <button wx:if="{{Player_turn==4}}" class="time_text" 
+  style="position: absolute; margin-top:250rpx; margin-left:85%;">
+  {{Left_time}}s</button>
+
+
 </view>
 
 <view class="operations">
@@ -180,3 +196,4 @@
     </view>
   </view>
 </view>
+

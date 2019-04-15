@@ -14,7 +14,7 @@ Page({
     white_wait: ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11"],
     black_left: ["black0", "black5", "black6", "black7", "black8", "black9", "blackjoker"],
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"],
-    black_left: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker", ],
+    black_left: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker",],
 
     cards_imageURL: {
       "black0": "https://i.postimg.cc/bwvNzMjJ/black0.jpg",
@@ -68,14 +68,17 @@ Page({
     state_left: false,
     state_standed: false,
     state_judge: true,
+    // 新加的变量，Player_turn表示当前是哪个玩家，Left_time表示剩余时间
+    Player_turn: 4,
+    Left_time: 10,
   },
   /*刷新牌组显示
    */
 
   onLoad(nowPage) {
     this.setData({
-        title: nowPage.title,
-      }),
+      title: nowPage.title,
+    }),
       beginTime = 2
     showTime = 5
     playTime = 10
@@ -119,9 +122,9 @@ Page({
     })
 
   },
-  refreshCardBind: function(e) {
+  refreshCardBind: function (e) {
     var that = this
-    var i = setInterval(function() {
+    var i = setInterval(function () {
       that.setData({
         player1_cards: player0.cardIndexForBind,
         player2_cards: player1.cardIndexForBind,
@@ -146,7 +149,7 @@ Page({
   onReady(e) {
     this.refreshCardBind()
   },
-  cardTouchEnd: function(e) { //之后配合前端进行修改
+  cardTouchEnd: function (e) { //之后配合前端进行修改
     if (gameStatus != 3) return
     console.log(e.target)
     let buttonId = e.target["id"]
@@ -156,7 +159,7 @@ Page({
       Isstandedcardchose: true
     })
   },
-  listSelectEnd: function(e) { //之后配合前端进行修改
+  listSelectEnd: function (e) { //之后配合前端进行修改
     if (gameStatus != 3) return
     guessCons = false
     let buttonId = e.target["id"]
@@ -165,12 +168,12 @@ Page({
     if (guessPlayerLoc == 1) {
       guessCons = player1.guessedJudge(guessCardName, guessCardTrueName)
     } else
-    if (guessPlayerLoc == 2) {
-      guessCons = player2.guessedJudge(guessCardName, guessCardTrueName)
-    } else
-    if (guessPlayerLoc == 3) {
-      guessCons = player3.guessedJudge(guessCardName, guessCardTrueName)
-    }
+      if (guessPlayerLoc == 2) {
+        guessCons = player2.guessedJudge(guessCardName, guessCardTrueName)
+      } else
+        if (guessPlayerLoc == 3) {
+          guessCons = player3.guessedJudge(guessCardName, guessCardTrueName)
+        }
     if (guessCons == true) {
       player0.succussJudge()
       this.setData({
@@ -190,7 +193,7 @@ Page({
       state_judge: true
     })
   },
-  endMyTurn: function(e) {
+  endMyTurn: function (e) {
     showTime = 1
   }
 })
@@ -249,7 +252,7 @@ function changeState() {
     guessStatus -= 1
   } else {
     if (playerNum == 4) {
-      if (gameStatus == 3) {}
+      if (gameStatus == 3) { }
       if (gameStatus == 5) {
         player1.aiController()
       } else if (gameStatus == 7) {
@@ -350,23 +353,23 @@ function player() {
 }
 /*设置姓名
  */
-player.prototype.setName = function(newName) {
+player.prototype.setName = function (newName) {
   this.playerName = newName
 }
 /*设置位置
  */
-player.prototype.setLoc = function(newLoc) {
+player.prototype.setLoc = function (newLoc) {
   this.playerLoc = newLoc
 }
 /*设置gotCard
  */
-player.prototype.setGotCard = function(ifGotCard) {
+player.prototype.setGotCard = function (ifGotCard) {
   this.gotCard = ifGotCard
 }
 /*抽一张牌
  **0:随机;1:white;2:black
  */
-player.prototype.getCard = function(getCardMod) {
+player.prototype.getCard = function (getCardMod) {
   if (cardArrayWhite.length <= 0 && cardArrayWhite.length <= 0) return
   if (getCardMod != 1 && getCardMod != 2) {
     getCardMod = Math.floor(Math.random() * (2)) + 1
@@ -404,7 +407,7 @@ player.prototype.getCard = function(getCardMod) {
  **guessCardName:猜的牌的名称
  **guessCardTrueName:被猜的牌的真实名称
  */
-player.prototype.guessedJudge = function(guessingCardName, guessingCardTrueName) {
+player.prototype.guessedJudge = function (guessingCardName, guessingCardTrueName) {
   if (guessingCardTrueName == guessingCardName) {
     for (let i = 0; i < this.cardNum; i++) {
       console.log(i)
@@ -421,12 +424,12 @@ player.prototype.guessedJudge = function(guessingCardName, guessingCardTrueName)
 }
 /*猜牌成功的情况
  */
-player.prototype.succussJudge = function() {
+player.prototype.succussJudge = function () {
   showTime = playTime
 }
 /*猜牌失败的情况
  */
-player.prototype.failJudge = function() {
+player.prototype.failJudge = function () {
   for (let i = 0; i < this.cardNum; i++) {
     if (this.cardIndex[i] == this.lastCardIndex) {
       this.cardVisible[i] = true
@@ -437,14 +440,14 @@ player.prototype.failJudge = function() {
 }
 /*查看是否还有立牌
  */
-player.prototype.haveUnvisibleCard = function() {
+player.prototype.haveUnvisibleCard = function () {
   for (let i = 0; i < this.cardNum; i++) {
     if (this.cardVisible[i] == false)
       return true
   }
   return false
 }
-player.prototype.aiController = function() {
+player.prototype.aiController = function () {
   if (aiMode == "freshman") {
     //随便找个人随便抽张牌随便猜个数
     do {
@@ -456,18 +459,18 @@ player.prototype.aiController = function() {
       guessCardTrueName = player0.cardIndexForBind[Math.floor(Math.random() * (player0.cardNum))]
       guessCons = player0.guessedJudge(guessCardName, guessCardTrueName)
     } else
-    if (guessPlayerLoc == 1) {
-      guessCardTrueName = player1.cardIndexForBind[Math.floor(Math.random() * (player1.cardNum))]
-      guessCons = player1.guessedJudge(guessCardName, guessCardTrueName)
-    } else
-    if (guessPlayerLoc == 2) {
-      guessCardTrueName = player2.cardIndexForBind[Math.floor(Math.random() * (player2.cardNum))]
-      guessCons = player2.guessedJudge(guessCardName, guessCardTrueName)
-    } else
-    if (guessPlayerLoc == 3) {
-      guessCardTrueName = player3.cardIndexForBind[Math.floor(Math.random() * (player3.cardNum))]
-      guessCons = player3.guessedJudge(guessCardName, guessCardTrueName)
-    }
+      if (guessPlayerLoc == 1) {
+        guessCardTrueName = player1.cardIndexForBind[Math.floor(Math.random() * (player1.cardNum))]
+        guessCons = player1.guessedJudge(guessCardName, guessCardTrueName)
+      } else
+        if (guessPlayerLoc == 2) {
+          guessCardTrueName = player2.cardIndexForBind[Math.floor(Math.random() * (player2.cardNum))]
+          guessCons = player2.guessedJudge(guessCardName, guessCardTrueName)
+        } else
+          if (guessPlayerLoc == 3) {
+            guessCardTrueName = player3.cardIndexForBind[Math.floor(Math.random() * (player3.cardNum))]
+            guessCons = player3.guessedJudge(guessCardName, guessCardTrueName)
+          }
     if (guessCons == true) {
       this.succussJudge()
     } else {
