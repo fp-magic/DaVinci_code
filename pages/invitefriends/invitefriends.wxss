@@ -1,0 +1,41 @@
+.title{
+  display: flex;
+  justify-content: center;
+  margin-top: 50rpx;
+  font-size: 60rpx;
+  line-height: 84rpx;
+}
+.player{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.playerinfo-nickname{
+  font-size: 40rpx;
+  line-height: 56rpx;
+}
+
+load{
+    margin-top: 100rpx;
+    font-size: 32rpx;
+}
+.flex-row{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.flex-coloumn{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+.start_button{
+  margin-top: 150rpx;
+  width: 250rpx;
+  height: 100rpx;
+  font-size: 40rpx;
+  line-height: 56rpx;
+  text-align: center;
+}
+
+

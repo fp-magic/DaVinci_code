@@ -1,0 +1,34 @@
+<text class="title">房间号:{{Room_id}}</text>
+
+
+<view class="flex-row" style="margin-top:100rpx;">
+  <view class="flex-coloumn">
+    <!-- 显示房主信息（即player1） -->
+    <view class="player">
+      <image style="height:100rpx; width:100rpx;" src="{{playerInfo_1.avatarUrl}}"></image>
+      <text class="playerinfo-nickname">{{playerInfo_1.nickname}}</text>
+    </view>
+
+     <!-- 显示玩家三信息，玩家三不在时显示默认值 -->
+    <view class="player" style="margin-top: 100rpx;">
+      <image style="height:100rpx; width:100rpx;" src="{{playerInfo_3.avatarUrl}}"></image>
+      <text class="playerinfo-nickname">{{playerInfo_3.nickname}}</text>
+    </view>
+  </view>
+
+  <view class="flex-coloumn">
+   <!-- 显示玩家二信息，玩家二不在时显示默认值 -->
+    <view class="player">
+      <image style="height:100rpx; width:100rpx;" src="{{playerInfo_2.avatarUrl}}"></image>
+      <text class="playerinfo-nickname">{{playerInfo_2.nickname}}</text>
+    </view>
+
+   <!-- 显示玩家四信息，玩家四不在时显示默认值 -->
+   <view class="player" style="margin-top: 100rpx;">
+      <image style="height:100rpx; width:100rpx;" src="{{playerInfo_4.avatarUrl}}"></image>
+      <text class="playerinfo-nickname">{{playerInfo_4.nickname}}</text>
+    </view>
+  </view>
+</view>
+
+<button class="start_button" bindtap='startgame'>开始游戏</button>
