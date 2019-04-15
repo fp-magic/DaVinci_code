@@ -48,7 +48,7 @@ Page({
   },
   mode1tap: function(e) {
     wx.navigateTo({
-      url: '../game/game'
+      url: '../GroupTeam/GroupTeam'
     })
   },
   mode2tap: function (e) {

@@ -6,7 +6,8 @@
     "pages/tutorial/tutorial",
     "pages/option/option",
     "pages/ranking/ranking",
-    "pages/GroupTeam/GroupTeam"
+    "pages/GroupTeam/GroupTeam",
+    "pages/invitefriends/invitefriends"
   ],
   "window": {
     "backgroundTextStyle": "light",
