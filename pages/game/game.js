@@ -5,9 +5,9 @@ Page({
     player2_avatar: "/images/头像.jpg",
     player3_avatar: "/images/头像.jpg",
     player4_avatar: "/images/头像.jpg",
-    player1_nickname: "I'mPlayer1",
-    player2_nickname: "I'mPlayer2",
-    player3_nickname: "I'mPlayer3",
+    player1_nickname: "I'mplayer[1]",
+    player2_nickname: "I'mplayer[2]",
+    player3_nickname: "I'mplayer[3]",
     player4_nickname: "I'mPlayer4",
 
 
@@ -76,60 +76,101 @@ Page({
    */
 
   onLoad(nowPage) {
-    this.setData({
-      title: nowPage.title,
-    }),
-      beginTime = 2
-    showTime = 5
-    playTime = 10
-    midTime = 5
-    playerNum = 4
-    gameStatus = 0
+    beginTime = 2 //游戏开始前等待时间
+    showTime = 5 //用于显示的当前状态剩余时间
+    playTime = 10 //游戏内回合时间
+    midTime = 5 //回合间等待时间
+    playerNum = 4 //玩家人数
+    gameStatus = 0 //游戏进行状态
     guessStatus = 0
-    aiMode = "freshman"
+    aiMode = "freshman" //ai难度
+    playMode = "single" //游戏模，sigle是单人模式，multi是好友对战
+    isHost = true
+    myLoc = 0
+    openId = ["123", "456", "789"]
+    nickName = ["player1", "player2", "player3"]
     cardNameForBind = ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"]
     for (let i = 0; i < cardNameForBind.length; i++) {
       cardVisibleDict[cardNameForBind[i]] = false
     }
-    changeState()
-
-    console.log(cardNameForBind)
-    cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
-    cardArrayWhiteForBind = countForBind(cardArrayWhite)
-    cardArrayBlack = shuffleSwap(createArray(12))
-    for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
-    cardArrayBlackForBind = countForBind(cardArrayBlack)
-    console.log(cardArrayWhite, cardArrayBlack)
-    if (playerNum == 4) { //发牌
-      for (let i = 0; i < 3; i++) player0.getCard(0)
-      for (let i = 0; i < 3; i++) player1.getCard(0)
-      for (let i = 0; i < 3; i++) player2.getCard(0)
-      for (let i = 0; i < 3; i++) player3.getCard(0)
+    if (playMode == "multi") {
+      initSocket()
     }
-    player0.setLoc(0)
-    player1.setLoc(1)
-    player2.setLoc(2)
-    player3.setLoc(3)
-    gameStatus = 1
+    if (playMode == "multi" && isHost) {
+      this.sendSocketMessage({
+        "action": "startroomgame",
+        "data": {
+          "openid": this.globalData.openid,
+          "roomid": roomId
+        }
+      })
+    }
+    if (isHost || playMod == "single") {
+      changeState()
+      cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
+      cardArrayBlack = shuffleSwap(createArray(12))
+      this.sendCardInfo()
+      for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
+      cardArrayWhiteForBind = countForBind(cardArrayWhite)
+      cardArrayBlackForBind = countForBind(cardArrayBlack)
+      console.log(cardArrayWhite, cardArrayBlack) 
+      
+      if (playerNum == 4) { //发牌
+        for (let i = 0; i < 3; i++) player[0].getCard(0)
+        for (let i = 0; i < 3; i++) player[1].getCard(0)
+        for (let i = 0; i < 3; i++) player[2].getCard(0)
+        for (let i = 0; i < 3; i++) player[3].getCard(0)
+      }
+      player[0].setLoc(0)
+      player[1].setLoc(1)
+      player[2].setLoc(2)
+      player[3].setLoc(3)
+      gameStatus = 1
+    }
     this.setData({
-      player1_cards: player0.cardIndexForBind,
-      player2_cards: player1.cardIndexForBind,
-      player3_cards: player2.cardIndexForBind,
-      player4_cards: player3.cardIndexForBind,
+      player1_cards: player[0].cardIndexForBind,
+      player2_cards: player[1].cardIndexForBind,
+      player3_cards: player[2].cardIndexForBind,
+      player4_cards: player[3].cardIndexForBind,
       white_left: cardArrayWhiteForBind,
       black_left: cardArrayBlackForBind,
       cards_dict: cardVisibleDict
     })
-
+    
+  },
+  onLoadAffiliate: function(){
+    for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
+    cardArrayWhiteForBind = countForBind(cardArrayWhite)
+    cardArrayBlackForBind = countForBind(cardArrayBlack)
+    console.log(cardArrayWhite, cardArrayBlack)
+    if (playerNum == 4) { //发牌
+      for (let i = 0; i < 3; i++) player[0].getCard(0)
+      for (let i = 0; i < 3; i++) player[1].getCard(0)
+      for (let i = 0; i < 3; i++) player[2].getCard(0)
+      for (let i = 0; i < 3; i++) player[3].getCard(0)
+    }
+    player[0].setLoc(0)
+    player[1].setLoc(1)
+    player[2].setLoc(2)
+    player[3].setLoc(3)
+    this.setData({
+      player1_cards: player[0].cardIndexForBind,
+      player2_cards: player[1].cardIndexForBind,
+      player3_cards: player[2].cardIndexForBind,
+      player4_cards: player[3].cardIndexForBind,
+      white_left: cardArrayWhiteForBind,
+      black_left: cardArrayBlackForBind,
+      cards_dict: cardVisibleDict
+    })
   },
   refreshCardBind: function (e) {
     var that = this
     var i = setInterval(function () {
       that.setData({
-        player1_cards: player0.cardIndexForBind,
-        player2_cards: player1.cardIndexForBind,
-        player3_cards: player2.cardIndexForBind,
-        player4_cards: player3.cardIndexForBind,
+        player1_cards: player[0].cardIndexForBind,
+        player2_cards: player[1].cardIndexForBind,
+        player3_cards: player[2].cardIndexForBind,
+        player4_cards: player[3].cardIndexForBind,
         white_left: cardArrayWhiteForBind,
         black_left: cardArrayBlackForBind,
         cards_dict: cardVisibleDict
@@ -166,28 +207,28 @@ Page({
     guessCardName = buttonId
     console.log(guessPlayerLoc, guessCardName, guessCardTrueName)
     if (guessPlayerLoc == 1) {
-      guessCons = player1.guessedJudge(guessCardName, guessCardTrueName)
+      guessCons = player[1].guessedJudge(guessCardName, guessCardTrueName)
     } else
-      if (guessPlayerLoc == 2) {
-        guessCons = player2.guessedJudge(guessCardName, guessCardTrueName)
-      } else
-        if (guessPlayerLoc == 3) {
-          guessCons = player3.guessedJudge(guessCardName, guessCardTrueName)
-        }
+    if (guessPlayerLoc == 2) {
+      guessCons = player[2].guessedJudge(guessCardName, guessCardTrueName)
+    } else
+    if (guessPlayerLoc == 3) {
+      guessCons = player[3].guessedJudge(guessCardName, guessCardTrueName)
+    }
     if (guessCons == true) {
-      player0.succussJudge()
+      player[0].succussJudge()
       this.setData({
         Isjudgeright: true
       })
     } else {
-      player0.failJudge()
+      player[0].failJudge()
       this.setData({
         Isjudgeright: false
       })
     }
     console.log(guessCons)
     guessStatus = 2
-    player0.guessed = true
+    player[0].guessed = true
     this.setData({
       Isstandedcardchose: false,
       state_judge: true
@@ -195,6 +236,80 @@ Page({
   },
   endMyTurn: function (e) {
     showTime = 1
+  },
+  initSocket() {
+    var that = this
+    that.globalData.localSocket = wx.connectSocket({
+      url: 'ws://120.78.169.154:8689/websocket'
+    })
+
+    that.globalData.localSocket.onOpen(function(res) {
+      console.log('WebSocket连接已打开！')
+      socketOpen = true
+      for (let i = 0; i < socketMsgQueue.length; i++) {
+        this.sendSocketMessage(socketMsgQueue[i])
+      }
+      socketMsgQueue = []
+    })
+    that.globalData.localSocket.onClose(function(res) {
+      console.log('close:', res)
+    })
+    that.globalData.localSocket.onMessage(function(res) {
+      console.log('message: ', res)
+      var that = this
+      var resData = JSON.parse(res.data)
+      if (resData.action == "startroomgameres" && resData.status == 0) {
+        for (i = 0; i < 4; i++)
+          if (resData.data.members[i].openid != that.globalData.openid) {
+            openId.push(resData.data.members[i].openid)
+            nickName.push(resData.data.members[i].nickName)
+            avatarUrl.push(resData.data.members[i].avatarUrl)
+          }
+      } else if (resData.action == "otherbroadcast"){
+        if(resData.content.openid==that.globalData.openid){
+          content=resData.content
+          if(content.type=="cardInfo"){
+            myLoc=content.loc
+            cardArrayWhite=content.cardArrayWhite
+            cardArrayBlack=content.cardArrayBlack
+            this.onLoadAffiliate()
+          }
+        }
+      }
+    })
+  },
+  sendSocketMessage: function(msg) {
+    if (socketOpen) {
+      this.globalData.localSocket.send({
+        data: JSON.stringify(msg)
+      })
+    } else {
+      socketMsgQueue.push(msg)
+    }
+  },
+  globalData: {
+    userInfo: null,
+    openid: {},
+    localSocket: {}
+  },
+  sendCardInfo(){
+    for(let i=0;i<3;i++){
+      this.sendSocketMessage({
+        "action": "broadcast",
+        "roomid": roomId,
+        "content": {
+          "type":"cardInfo",
+          "openid": this.globalData.openid,
+          "roomid": roomId,
+          "content": {
+            "openid": openId[i],
+            "loc": i+1,
+            "cardArrayWhite": cardArrayWhite,
+            "cardArrayBlack": cardArrayBlack
+          }
+        }
+      })
+    }
   }
 })
 let beginTime, showTime //进入时间,倒计时用时间
@@ -202,7 +317,11 @@ let playTime, midTime //回合时间，回合中间时间
 let playerNum //游戏人数，默认为4
 let gameStatus, gameStatus2, guessStatus
 let guessPlayerLoc, guessCardName, guessCardTrueName, guessCons //要猜的玩家位置编号,牌的名称,牌的实际名称和结果
-let aiMode //ai智商
+let aiMode, playMode, isHost //ai智商,游戏模式
+let roomId,myLoc
+let openId = new Array(3)
+let nickName = new Array(3)
+let avatarUrl = new Array(3)
 /*gameStatus:当前游戏状态
  **四人时0/1/2/3用于表示自己的状态
  **0表示游戏结束
@@ -217,12 +336,15 @@ let cardArrayBlack = new Array() //总牌组
 let cardArrayWhiteForBind = new Array()
 let cardArrayBlackForBind = new Array()
 const app = getApp()
-let player0 = new player()
-let player1 = new player()
-let player2 = new player()
-let player3 = new player()
+let player = new Array(4)
+player[0] = new oneplayer()
+player[1] = new oneplayer()
+player[2] = new oneplayer()
+player[3] = new oneplayer()
 let cardNameForBind = new Array(24)
 let cardVisibleDict = new Object()
+let socketOpen
+let socketMsgQueue= new Array()
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
@@ -254,11 +376,11 @@ function changeState() {
     if (playerNum == 4) {
       if (gameStatus == 3) { }
       if (gameStatus == 5) {
-        player1.aiController()
+        player[1].aiController()
       } else if (gameStatus == 7) {
-        player2.aiController()
+        player[2].aiController()
       } else if (gameStatus == 9) {
-        player3.aiController()
+        player[3].aiController()
       }
     } else {
       //todo!
@@ -268,29 +390,29 @@ function changeState() {
     if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
       gameStatus += 1
       if (gameStatus == 3) {
-        if (!player0.gotCard) {
-          player0.getCard(0)
+        if (!player[0].gotCard) {
+          player[0].getCard(0)
         }
-        player0.gotCard = false
-        player0.guessed = false
+        player[0].gotCard = false
+        player[0].guessed = false
       } else if (gameStatus == 5) {
-        if (!player1.gotCard) {
-          player1.getCard(0)
+        if (!player[1].gotCard) {
+          player[1].getCard(0)
         }
-        player1.gotCard = false
-        player1.guessed = false
+        player[1].gotCard = false
+        player[1].guessed = false
       } else if (gameStatus == 7) {
-        if (!player2.gotCard) {
-          player2.getCard(0)
+        if (!player[2].gotCard) {
+          player[2].getCard(0)
         }
-        player2.gotCard = false
-        player2.guessed = false
+        player[2].gotCard = false
+        player[2].guessed = false
       } else if (gameStatus == 9) {
-        if (!player3.gotCard) {
-          player3.getCard(0)
+        if (!player[3].gotCard) {
+          player[3].getCard(0)
         }
-        player3.gotCard = false
-        player3.guessed = false
+        player[3].gotCard = false
+        player[3].guessed = false
       }
       showTime = playTime
     } else {
@@ -298,25 +420,25 @@ function changeState() {
       console.log(cardArrayWhite, cardArrayBlack, cardVisibleDict)
       if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
         if (gameStatus == 1) {
-          player0.setGotCard(false)
-          player1.setGotCard(false)
-          player2.setGotCard(false)
-          player3.setGotCard(false)
+          player[0].setGotCard(false)
+          player[1].setGotCard(false)
+          player[2].setGotCard(false)
+          player[3].setGotCard(false)
         } else if (gameStatus == 3) {
-          if (!player0.guessed) {
-            player0.failJudge()
+          if (!player[0].guessed) {
+            player[0].failJudge()
           }
         } else if (gameStatus == 5) {
-          if (!player1.guessed) {
-            player1.failJudge()
+          if (!player[1].guessed) {
+            player[1].failJudge()
           }
         } else if (gameStatus == 7) {
-          if (!player2.guessed) {
-            player2.failJudge()
+          if (!player[2].guessed) {
+            player[2].failJudge()
           }
         } else if (gameStatus == 9) {
-          if (!player3.guessed) {
-            player3.failJudge()
+          if (!player[3].guessed) {
+            player[3].failJudge()
           }
         }
         gameStatus += 1
@@ -339,7 +461,20 @@ function changeState() {
  **playerLoc:玩家的位置
  **guessed:本回合是否猜过
  */
-function player() {
+
+/*多人游戏流程
+ *主机：
+ * 与单人模式类似
+ * 初始化时向从机根据从机位置发送牌堆情况和玩家实际位置
+ * 在changestate中向从机根据从机位置发送showTime和gameStatus
+ * 自己的猜牌判定结果和收到猜牌判定结果后根据从机位置处理后根据从机位置转发给其他从机
+ *从机：   
+ * 与单人模式类似
+ * 在接收到主机的牌堆情况后进行牌堆相关的初始化
+ * 接收主机发送的showTime和gameStatus来完成changestate中的功能，需要额外记录上次接收的gameStatus来判断是否发生变化（这个方案比较好写且稳定，但由于延迟游戏体验会有一定影响）
+ * 自己的猜牌判定结果对自己进行修改后立即发送给主机
+ */
+function oneplayer() {
   this.cardIndex = new Array()
   this.cardIndexForBind = new Array()
   this.cardVisible = new Array()
@@ -353,23 +488,24 @@ function player() {
 }
 /*设置姓名
  */
-player.prototype.setName = function (newName) {
+oneplayer.prototype.setName = function(newName) {
   this.playerName = newName
 }
 /*设置位置
  */
-player.prototype.setLoc = function (newLoc) {
+oneplayer.prototype.setLoc = function(newLoc) {
   this.playerLoc = newLoc
 }
 /*设置gotCard
  */
-player.prototype.setGotCard = function (ifGotCard) {
+
+oneplayer.prototype.setGotCard = function(ifGotCard) {
   this.gotCard = ifGotCard
 }
 /*抽一张牌
  **0:随机;1:white;2:black
  */
-player.prototype.getCard = function (getCardMod) {
+oneplayer.prototype.getCard = function(getCardMod) {
   if (cardArrayWhite.length <= 0 && cardArrayWhite.length <= 0) return
   if (getCardMod != 1 && getCardMod != 2) {
     getCardMod = Math.floor(Math.random() * (2)) + 1
@@ -407,7 +543,7 @@ player.prototype.getCard = function (getCardMod) {
  **guessCardName:猜的牌的名称
  **guessCardTrueName:被猜的牌的真实名称
  */
-player.prototype.guessedJudge = function (guessingCardName, guessingCardTrueName) {
+oneplayer.prototype.guessedJudge = function(guessingCardName, guessingCardTrueName) {
   if (guessingCardTrueName == guessingCardName) {
     for (let i = 0; i < this.cardNum; i++) {
       console.log(i)
@@ -424,12 +560,12 @@ player.prototype.guessedJudge = function (guessingCardName, guessingCardTrueName
 }
 /*猜牌成功的情况
  */
-player.prototype.succussJudge = function () {
+oneplayer.prototype.succussJudge = function() {
   showTime = playTime
 }
 /*猜牌失败的情况
  */
-player.prototype.failJudge = function () {
+oneplayer.prototype.failJudge = function() {
   for (let i = 0; i < this.cardNum; i++) {
     if (this.cardIndex[i] == this.lastCardIndex) {
       this.cardVisible[i] = true
@@ -440,14 +576,14 @@ player.prototype.failJudge = function () {
 }
 /*查看是否还有立牌
  */
-player.prototype.haveUnvisibleCard = function () {
+oneplayer.prototype.haveUnvisibleCard = function() {
   for (let i = 0; i < this.cardNum; i++) {
     if (this.cardVisible[i] == false)
       return true
   }
   return false
 }
-player.prototype.aiController = function () {
+oneplayer.prototype.aiController = function() {
   if (aiMode == "freshman") {
     //随便找个人随便抽张牌随便猜个数
     do {
@@ -456,21 +592,21 @@ player.prototype.aiController = function () {
     guessCardName = cardNameForBind[Math.floor(Math.random() * (24))]
     guessCons = false
     if (guessPlayerLoc == 0) {
-      guessCardTrueName = player0.cardIndexForBind[Math.floor(Math.random() * (player0.cardNum))]
-      guessCons = player0.guessedJudge(guessCardName, guessCardTrueName)
+      guessCardTrueName = player[0].cardIndexForBind[Math.floor(Math.random() * (player[0].cardNum))]
+      guessCons = player[0].guessedJudge(guessCardName, guessCardTrueName)
     } else
-      if (guessPlayerLoc == 1) {
-        guessCardTrueName = player1.cardIndexForBind[Math.floor(Math.random() * (player1.cardNum))]
-        guessCons = player1.guessedJudge(guessCardName, guessCardTrueName)
-      } else
-        if (guessPlayerLoc == 2) {
-          guessCardTrueName = player2.cardIndexForBind[Math.floor(Math.random() * (player2.cardNum))]
-          guessCons = player2.guessedJudge(guessCardName, guessCardTrueName)
-        } else
-          if (guessPlayerLoc == 3) {
-            guessCardTrueName = player3.cardIndexForBind[Math.floor(Math.random() * (player3.cardNum))]
-            guessCons = player3.guessedJudge(guessCardName, guessCardTrueName)
-          }
+    if (guessPlayerLoc == 1) {
+      guessCardTrueName = player[1].cardIndexForBind[Math.floor(Math.random() * (player[1].cardNum))]
+      guessCons = player[1].guessedJudge(guessCardName, guessCardTrueName)
+    } else
+    if (guessPlayerLoc == 2) {
+      guessCardTrueName = player[2].cardIndexForBind[Math.floor(Math.random() * (player[2].cardNum))]
+      guessCons = player[2].guessedJudge(guessCardName, guessCardTrueName)
+    } else
+    if (guessPlayerLoc == 3) {
+      guessCardTrueName = player[3].cardIndexForBind[Math.floor(Math.random() * (player[3].cardNum))]
+      guessCons = player[3].guessedJudge(guessCardName, guessCardTrueName)
+    }
     if (guessCons == true) {
       this.succussJudge()
     } else {

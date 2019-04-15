@@ -80,8 +80,8 @@ App({
                 "nickName": res.userInfo.nickName,
                 "avatarUrl": res.userInfo.avatarUrl,
                 "gender": res.userInfo.gender
-              }
-            })
+              } 
+            }) 
           }
         })
       }
