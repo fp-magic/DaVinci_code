@@ -14,7 +14,7 @@ Page({
     white_wait: ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11"],
     black_left: ["black0", "black5", "black6", "black7", "black8", "black9", "blackjoker"],
     black_wait: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"],
-    black_left: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker",],
+    black_left: ["black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11", "blackjoker", ],
 
     cards_imageURL: {
       "black0": "https://i.postimg.cc/bwvNzMjJ/black0.jpg",
@@ -68,9 +68,6 @@ Page({
     state_left: false,
     state_standed: false,
     state_judge: true,
-    // 新加的变量，Player_turn表示当前是哪个玩家，Left_time表示剩余时间
-    Player_turn: 4,
-    Left_time: 10,
   },
   /*刷新牌组显示
    */
@@ -113,8 +110,8 @@ Page({
       for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
       cardArrayWhiteForBind = countForBind(cardArrayWhite)
       cardArrayBlackForBind = countForBind(cardArrayBlack)
-      console.log(cardArrayWhite, cardArrayBlack) 
-      
+      console.log(cardArrayWhite, cardArrayBlack)
+
       if (playerNum == 4) { //发牌
         for (let i = 0; i < 3; i++) player[0].getCard(0)
         for (let i = 0; i < 3; i++) player[1].getCard(0)
@@ -128,17 +125,17 @@ Page({
       gameStatus = 1
     }
     this.setData({
-      player1_cards: player[0].cardIndexForBind,
-      player2_cards: player[1].cardIndexForBind,
-      player3_cards: player[2].cardIndexForBind,
-      player4_cards: player[3].cardIndexForBind,
+      player1_cards: player[(0 + myLoc) % 4].cardIndexForBind,
+      player2_cards: player[(1 + myLoc) % 4].cardIndexForBind,
+      player3_cards: player[(2 + myLoc) % 4].cardIndexForBind,
+      player4_cards: player[(3 + myLoc) % 4].cardIndexForBind,
       white_left: cardArrayWhiteForBind,
       black_left: cardArrayBlackForBind,
       cards_dict: cardVisibleDict
     })
-    
+
   },
-  onLoadAffiliate: function(){
+  onLoadAffiliate: function() {
     for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
     cardArrayWhiteForBind = countForBind(cardArrayWhite)
     cardArrayBlackForBind = countForBind(cardArrayBlack)
@@ -154,23 +151,23 @@ Page({
     player[2].setLoc(2)
     player[3].setLoc(3)
     this.setData({
-      player1_cards: player[0].cardIndexForBind,
-      player2_cards: player[1].cardIndexForBind,
-      player3_cards: player[2].cardIndexForBind,
-      player4_cards: player[3].cardIndexForBind,
+      player1_cards: player[(0 + myLoc) % 4].cardIndexForBind,
+      player2_cards: player[(1 + myLoc) % 4].cardIndexForBind,
+      player3_cards: player[(2 + myLoc) % 4].cardIndexForBind,
+      player4_cards: player[(3 + myLoc) % 4].cardIndexForBind,
       white_left: cardArrayWhiteForBind,
       black_left: cardArrayBlackForBind,
       cards_dict: cardVisibleDict
     })
   },
-  refreshCardBind: function (e) {
+  refreshCardBind: function(e) {
     var that = this
-    var i = setInterval(function () {
+    var i = setInterval(function() {
       that.setData({
-        player1_cards: player[0].cardIndexForBind,
-        player2_cards: player[1].cardIndexForBind,
-        player3_cards: player[2].cardIndexForBind,
-        player4_cards: player[3].cardIndexForBind,
+        player1_cards: player[(0 + myLoc) % 4].cardIndexForBind,
+        player2_cards: player[(1 + myLoc) % 4].cardIndexForBind,
+        player3_cards: player[(2 + myLoc) % 4].cardIndexForBind,
+        player4_cards: player[(3 + myLoc) % 4].cardIndexForBind,
         white_left: cardArrayWhiteForBind,
         black_left: cardArrayBlackForBind,
         cards_dict: cardVisibleDict
@@ -190,8 +187,8 @@ Page({
   onReady(e) {
     this.refreshCardBind()
   },
-  cardTouchEnd: function (e) { //之后配合前端进行修改
-    if (gameStatus != 3) return
+  cardTouchEnd: function(e) { //之后配合前端进行修改
+    if (gameStatus != 3 + myLoc * 2) return
     console.log(e.target)
     let buttonId = e.target["id"]
     guessPlayerLoc = Number(buttonId[6]) - 1 //分别表示点击的玩家编号的牌的编号
@@ -200,41 +197,52 @@ Page({
       Isstandedcardchose: true
     })
   },
-  listSelectEnd: function (e) { //之后配合前端进行修改
-    if (gameStatus != 3) return
+  listSelectEnd: function(e) { //之后配合前端进行修改
+    if (gameStatus != 3 + myLoc * 2) return
     guessCons = false
     let buttonId = e.target["id"]
     guessCardName = buttonId
     console.log(guessPlayerLoc, guessCardName, guessCardTrueName)
-    if (guessPlayerLoc == 1) {
-      guessCons = player[1].guessedJudge(guessCardName, guessCardTrueName)
-    } else
-    if (guessPlayerLoc == 2) {
-      guessCons = player[2].guessedJudge(guessCardName, guessCardTrueName)
-    } else
-    if (guessPlayerLoc == 3) {
-      guessCons = player[3].guessedJudge(guessCardName, guessCardTrueName)
+    if (guessPlayerLoc > 3 || guessPlayerLoc < 0) {
+      console.error("guessPlayerLoc out of range!")
+      return
     }
-    if (guessCons == true) {
-      player[0].succussJudge()
-      this.setData({
-        Isjudgeright: true
-      })
-    } else {
-      player[0].failJudge()
-      this.setData({
-        Isjudgeright: false
-      })
+    guessCons = player[(guessPlayerLoc + myLoc) % 4].guessedJudge(guessCardName, guessCardTrueName) //获取猜牌结果
+    if (playMode == "single") { //单人模式直接判断
+      if (guessCons == true) {
+        player[myLoc].succussJudge()
+        this.setData({
+          Isjudgeright: true
+        })
+      } else {
+        player[myLoc].failJudge()
+        this.setData({
+          Isjudgeright: false
+        })
+      }
+    } else if (playMode == "multi") { //多人模式将结果发给其他所有玩家
+      if (guessCons == true) {
+        player[myLoc].succussJudge()
+        this.setData({
+          Isjudgeright: true
+        })
+      } else {
+        player[myLoc].failJudge()
+        this.setData({
+          Isjudgeright: false
+        })
+      }
+      this.sendGuessInfo()
     }
     console.log(guessCons)
     guessStatus = 2
-    player[0].guessed = true
+    player[myLoc].guessed = true
     this.setData({
       Isstandedcardchose: false,
       state_judge: true
     })
   },
-  endMyTurn: function (e) {
+  endMyTurn: function(e) {
     showTime = 1
   },
   initSocket() {
@@ -258,21 +266,35 @@ Page({
       console.log('message: ', res)
       var that = this
       var resData = JSON.parse(res.data)
-      if (resData.action == "startroomgameres" && resData.status == 0) {
+      if (resData.action == "startroomgameres" || resData.action == "roomgamestarted") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
         for (i = 0; i < 4; i++)
           if (resData.data.members[i].openid != that.globalData.openid) {
             openId.push(resData.data.members[i].openid)
             nickName.push(resData.data.members[i].nickName)
             avatarUrl.push(resData.data.members[i].avatarUrl)
           }
-      } else if (resData.action == "otherbroadcast"){
-        if(resData.content.openid==that.globalData.openid){
-          content=resData.content
-          if(content.type=="cardInfo"){
-            myLoc=content.loc
-            cardArrayWhite=content.cardArrayWhite
-            cardArrayBlack=content.cardArrayBlack
+      } else if (resData.action == "otherbroadcast") {
+        if (resData.content.openid == that.globalData.openid) {
+          content = resData.content
+          if (content.type == "cardInfo") {
+            myLoc = content.loc
+            cardArrayWhite = content.cardArrayWhite
+            cardArrayBlack = content.cardArrayBlack
             this.onLoadAffiliate()
+          } else if (content.type == "guessInfo") {
+            let playerLoc = content.playerLoc
+            guessPlayerLoc = content.guessPlayerLoc
+            guessCardName = content.guessCardName
+            guessCardTrueName = content.guessCardTrueName
+            guessCons = content.guessCons
+            player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
+            if (guessCons) {
+              player[playerLoc].succussJudge()
+            } else {
+              player[playerLoc].failJudge()
+            }
+          } else if (content.type == "stateInfo") {
+            /*todo!*/
           }
         }
       }
@@ -292,20 +314,62 @@ Page({
     openid: {},
     localSocket: {}
   },
-  sendCardInfo(){
-    for(let i=0;i<3;i++){
+  sendCardInfo: function() { //发送牌堆信息，只有主机可以调用
+    if (myLoc != 0) {
+      console.error("the cardInfor is not sent by host player!")
+      return
+    }
+    for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
         "roomid": roomId,
         "content": {
-          "type":"cardInfo",
+          "type": "cardInfo",
           "openid": this.globalData.openid,
           "roomid": roomId,
           "content": {
             "openid": openId[i],
-            "loc": i+1,
+            "loc": i + 1,
             "cardArrayWhite": cardArrayWhite,
             "cardArrayBlack": cardArrayBlack
+          }
+        }
+      })
+    }
+  },
+  sendGuessInfo: function() {
+    for (let i = 0; i < 3; i++) {
+      this.sendSocketMessage({
+        "action": "broadcast",
+        "roomid": roomId,
+        "content": {
+          "type": "guessInfo",
+          "openid": this.globalData.openid,
+          "roomid": roomId,
+          "content": {
+            "openid": openId[i],
+            "playerLoc": myLoc,
+            "guessPlayerLoc": guessPlayerLoc,
+            "guessCardName": guessCardName,
+            "guessCardTrueName": guessCardTrueName,
+            "guessCons": guessCons,
+          }
+        }
+      })
+    }
+  },
+  sendStateInfo: function() {
+    for (let i = 0; i < 3; i++) {
+      this.sendSocketMessage({
+        "action": "broadcast",
+        "roomid": roomId,
+        "content": {
+          "type": "stateInfo",
+          "openid": this.globalData.openid,
+          "roomid": roomId,
+          "content": {
+            "openid": openId[i],
+            /*todo!*/
           }
         }
       })
@@ -318,7 +382,7 @@ let playerNum //游戏人数，默认为4
 let gameStatus, gameStatus2, guessStatus
 let guessPlayerLoc, guessCardName, guessCardTrueName, guessCons //要猜的玩家位置编号,牌的名称,牌的实际名称和结果
 let aiMode, playMode, isHost //ai智商,游戏模式
-let roomId,myLoc
+let roomId, myLoc
 let openId = new Array(3)
 let nickName = new Array(3)
 let avatarUrl = new Array(3)
@@ -344,7 +408,7 @@ player[3] = new oneplayer()
 let cardNameForBind = new Array(24)
 let cardVisibleDict = new Object()
 let socketOpen
-let socketMsgQueue= new Array()
+let socketMsgQueue = new Array()
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
@@ -374,7 +438,7 @@ function changeState() {
     guessStatus -= 1
   } else {
     if (playerNum == 4) {
-      if (gameStatus == 3) { }
+      if (gameStatus == 3) {}
       if (gameStatus == 5) {
         player[1].aiController()
       } else if (gameStatus == 7) {
@@ -467,12 +531,14 @@ function changeState() {
  * 与单人模式类似
  * 初始化时向从机根据从机位置发送牌堆情况和玩家实际位置
  * 在changestate中向从机根据从机位置发送showTime和gameStatus
- * 自己的猜牌判定结果和收到猜牌判定结果后根据从机位置处理后根据从机位置转发给其他从机
+ * 自己的猜牌判定结果和收到猜牌判定结果后处理后转发给其他玩家
  *从机：   
  * 与单人模式类似
  * 在接收到主机的牌堆情况后进行牌堆相关的初始化
  * 接收主机发送的showTime和gameStatus来完成changestate中的功能，需要额外记录上次接收的gameStatus来判断是否发生变化（这个方案比较好写且稳定，但由于延迟游戏体验会有一定影响）
- * 自己的猜牌判定结果对自己进行修改后立即发送给主机
+ * 自己的猜牌判定结果和收到猜牌判定结果后处理后转发给其他玩家
+ * 
+ * 尽量保证发送方在发送前已经对信息针对接收方进行处理
  */
 function oneplayer() {
   this.cardIndex = new Array()
@@ -498,7 +564,6 @@ oneplayer.prototype.setLoc = function(newLoc) {
 }
 /*设置gotCard
  */
-
 oneplayer.prototype.setGotCard = function(ifGotCard) {
   this.gotCard = ifGotCard
 }
