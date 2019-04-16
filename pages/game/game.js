@@ -86,7 +86,7 @@ Page({
     aiMode = "freshman" //ai难度
     playMode = "single" //游戏模，sigle是单人模式，multi是好友对战
     isHost = true
-    myLoc = 0
+    myLoc = 1
     openId = ["123", "456", "789"]
     nickName = ["player1", "player2", "player3"]
     cardNameForBind = ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"]
@@ -105,11 +105,11 @@ Page({
         }
       })
     }
-    if (isHost || playMod == "single") {
+    if (isHost || playMode == "single") {
       changeState()
       cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
       cardArrayBlack = shuffleSwap(createArray(12))
-      this.sendCardInfo()
+      if (playMode == "multi") this.sendCardInfo()
       for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
       cardArrayWhiteForBind = countForBind(cardArrayWhite)
       cardArrayBlackForBind = countForBind(cardArrayBlack)
@@ -136,7 +136,7 @@ Page({
       black_left: cardArrayBlackForBind,
       cards_dict: cardVisibleDict,
       Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
-      Left_time:showTime
+      Left_time: showTime
     })
 
   },
@@ -181,7 +181,7 @@ Page({
         Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
         Left_time: showTime
       })
-      if (gameStatus == 3+myLoc*2) {
+      if (gameStatus == 3 + myLoc * 2) {
         that.setData({
           Ismyturn: true
         })
@@ -303,7 +303,9 @@ Page({
               player[playerLoc].failJudge()
             }
           } else if (content.type == "stateInfo") {
-            /*todo!*/
+            if (gameStatus != content.gameStatus) solveStateChange()
+            gameStatus = content.gameStatus
+            showTime = content.showTime
           }
         }
       }
@@ -325,7 +327,7 @@ Page({
   },
   sendCardInfo: function() { //发送牌堆信息，只有主机可以调用
     if (myLoc != 0) {
-      console.error("the cardInfor is not sent by host player!")
+      console.error("the cardInfo is not sent by host player!")
       return
     }
     for (let i = 0; i < 3; i++) {
@@ -346,7 +348,7 @@ Page({
       })
     }
   },
-  sendGuessInfo: function() {//发送猜牌信息
+  sendGuessInfo: function() { //发送猜牌信息
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
@@ -367,7 +369,7 @@ Page({
       })
     }
   },
-  sendStateInfo: function() {//发送状态信息
+  sendStateInfo: function() { //发送状态信息
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
@@ -378,7 +380,8 @@ Page({
           "roomid": roomId,
           "content": {
             "openid": openId[i],
-            /*todo!*/
+            "gameStatus": gameStatus,
+            "showTime": showTime
           }
         }
       })
@@ -447,82 +450,86 @@ function changeState() {
     guessStatus -= 1
   } else {
     if (playerNum == 4) {
-      if (gameStatus == 3) {}
-      if (gameStatus == 5) {
-        player[1].aiController()
+      if (gameStatus == 3) {
+        if (myLoc != 0) player[0].aiController()
+      } else if (gameStatus == 5) {
+        if (myLoc != 1) player[1].aiController()
       } else if (gameStatus == 7) {
-        player[2].aiController()
+        if (myLoc != 2) player[2].aiController()
       } else if (gameStatus == 9) {
-        player[3].aiController()
+        if (myLoc != 3) player[3].aiController()
       }
     } else {
       //todo!
     }
   }
   if (showTime <= 0) {
-    if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
-      gameStatus += 1
-      if (gameStatus == 3) {
-        if (!player[0].gotCard) {
-          player[0].getCard(0)
-        }
-        player[0].gotCard = false
-        player[0].guessed = false
-      } else if (gameStatus == 5) {
-        if (!player[1].gotCard) {
-          player[1].getCard(0)
-        }
-        player[1].gotCard = false
-        player[1].guessed = false
-      } else if (gameStatus == 7) {
-        if (!player[2].gotCard) {
-          player[2].getCard(0)
-        }
-        player[2].gotCard = false
-        player[2].guessed = false
-      } else if (gameStatus == 9) {
-        if (!player[3].gotCard) {
-          player[3].getCard(0)
-        }
-        player[3].gotCard = false
-        player[3].guessed = false
-      }
-      showTime = playTime
-    } else {
-      if (cardArrayWhite.length <= 0 && cardArrayBlack.length <= 0) gameStatus = 0
-      console.log(cardArrayWhite, cardArrayBlack, cardVisibleDict)
-      if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
-        if (gameStatus == 1) {
-          player[0].setGotCard(false)
-          player[1].setGotCard(false)
-          player[2].setGotCard(false)
-          player[3].setGotCard(false)
-        } else if (gameStatus == 3) {
-          if (!player[0].guessed) {
-            player[0].failJudge()
-          }
-        } else if (gameStatus == 5) {
-          if (!player[1].guessed) {
-            player[1].failJudge()
-          }
-        } else if (gameStatus == 7) {
-          if (!player[2].guessed) {
-            player[2].failJudge()
-          }
-        } else if (gameStatus == 9) {
-          if (!player[3].guessed) {
-            player[3].failJudge()
-          }
-        }
-        gameStatus += 1
-        showTime = midTime
-        if (gameStatus == 10) {
-          gameStatus = 2
-        }
-      }
+    solveStateChange()
+    gameStatus += 1
+    if (gameStatus == 10) {
+      gameStatus = 2
     }
   }
   let timer = setTimeout(changeState, 1000)
+}
+
+function solveStateChange() {
+  if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
+    if (gameStatus == 2) {
+      if (!player[0].gotCard) {
+        player[0].getCard(0)
+      }
+      player[0].gotCard = false
+      player[0].guessed = false
+    } else if (gameStatus == 4) {
+      if (!player[1].gotCard) {
+        player[1].getCard(0)
+      }
+      player[1].gotCard = false
+      player[1].guessed = false
+    } else if (gameStatus == 6) {
+      if (!player[2].gotCard) {
+        player[2].getCard(0)
+      }
+      player[2].gotCard = false
+      player[2].guessed = false
+    } else if (gameStatus == 8) {
+      if (!player[3].gotCard) {
+        player[3].getCard(0)
+      }
+      player[3].gotCard = false
+      player[3].guessed = false
+    }
+    showTime = playTime
+  } else {
+    if (cardArrayWhite.length <= 0 && cardArrayBlack.length <= 0) gameStatus = 0
+    console.log(cardArrayWhite, cardArrayBlack, cardVisibleDict)
+    if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
+      if (gameStatus == 1) {
+        player[0].setGotCard(false)
+        player[1].setGotCard(false)
+        player[2].setGotCard(false)
+        player[3].setGotCard(false)
+      } else if (gameStatus == 3) {
+        if (!player[0].guessed) {
+          player[0].failJudge()
+        }
+      } else if (gameStatus == 5) {
+        if (!player[1].guessed) {
+          player[1].failJudge()
+        }
+      } else if (gameStatus == 7) {
+        if (!player[2].guessed) {
+          player[2].failJudge()
+        }
+      } else if (gameStatus == 9) {
+        if (!player[3].guessed) {
+          player[3].failJudge()
+        }
+      }
+      showTime = midTime
+    }
+  }
 }
 /*以下用于定义一位玩家
  **cardIndex:存放玩家手上卡牌的编号,卡牌编号为0-23，其中0-11是白牌，12-23是黑牌
@@ -544,7 +551,7 @@ function changeState() {
  *从机：   
  * 与单人模式类似
  * 在接收到主机的牌堆情况后进行牌堆相关的初始化
- * 接收主机发送的showTime和gameStatus来完成changestate中的功能，需要额外记录上次接收的gameStatus来判断是否发生变化（这个方案比较好写且稳定，但由于延迟游戏体验会有一定影响）
+ * 接收主机发送的showTime和gameStatus来完成changestate中的功能（这个方案比较好写且稳定，但由于延迟游戏体验会有一定影响）
  * 自己的猜牌判定结果和收到猜牌判定结果后处理后转发给其他玩家
  * 
  * 尽量保证发送方在发送前已经对信息针对接收方进行处理
