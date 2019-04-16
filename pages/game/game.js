@@ -5,9 +5,9 @@ Page({
     player2_avatar: "/images/头像.jpg",
     player3_avatar: "/images/头像.jpg",
     player4_avatar: "/images/头像.jpg",
-    player1_nickname: "I'mplayer[1]",
-    player2_nickname: "I'mplayer[2]",
-    player3_nickname: "I'mplayer[3]",
+    player1_nickname: "I'mplayer1",
+    player2_nickname: "I'mplayer2",
+    player3_nickname: "I'mplayer3",
     player4_nickname: "I'mPlayer4",
 
 
@@ -68,6 +68,9 @@ Page({
     state_left: false,
     state_standed: false,
     state_judge: true,
+
+    Player_turn: 4,
+    Left_time: 10,
   },
   /*刷新牌组显示
    */
@@ -131,7 +134,9 @@ Page({
       player4_cards: player[(3 + myLoc) % 4].cardIndexForBind,
       white_left: cardArrayWhiteForBind,
       black_left: cardArrayBlackForBind,
-      cards_dict: cardVisibleDict
+      cards_dict: cardVisibleDict,
+      Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
+      Left_time:showTime
     })
 
   },
@@ -157,7 +162,9 @@ Page({
       player4_cards: player[(3 + myLoc) % 4].cardIndexForBind,
       white_left: cardArrayWhiteForBind,
       black_left: cardArrayBlackForBind,
-      cards_dict: cardVisibleDict
+      cards_dict: cardVisibleDict,
+      Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
+      Left_time: showTime
     })
   },
   refreshCardBind: function(e) {
@@ -170,9 +177,11 @@ Page({
         player4_cards: player[(3 + myLoc) % 4].cardIndexForBind,
         white_left: cardArrayWhiteForBind,
         black_left: cardArrayBlackForBind,
-        cards_dict: cardVisibleDict
+        cards_dict: cardVisibleDict,
+        Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
+        Left_time: showTime
       })
-      if (gameStatus == 3) {
+      if (gameStatus == 3+myLoc*2) {
         that.setData({
           Ismyturn: true
         })
@@ -337,7 +346,7 @@ Page({
       })
     }
   },
-  sendGuessInfo: function() {
+  sendGuessInfo: function() {//发送猜牌信息
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
@@ -358,7 +367,7 @@ Page({
       })
     }
   },
-  sendStateInfo: function() {
+  sendStateInfo: function() {//发送状态信息
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
@@ -390,9 +399,9 @@ let avatarUrl = new Array(3)
  **四人时0/1/2/3用于表示自己的状态
  **0表示游戏结束
  **1表示游戏即将开始
- **2表示猜牌中
- **3表示猜牌结束
- **4/5/6/7/8/9用于表示其他人状态，偶数表示猜牌中，奇数表示猜牌结束
+ **2表示准备回合
+ **3表示游戏回合
+ **4/5/6/7/8/9用于表示其他人状态，偶数表示准备回合，奇数表示游戏回合
  **偶数表示正常，奇数表示在猜牌
  */
 let cardArrayWhite = new Array() //总牌组
