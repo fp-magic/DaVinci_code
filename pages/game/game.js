@@ -1,3 +1,4 @@
+const app = getApp()
 Page({
   data: {
 
@@ -73,7 +74,7 @@ Page({
     Left_time: 10,
   },
   /*刷新牌组显示
-   */
+   */ 
 
   onLoad(nowPage) {
     beginTime = 2 //游戏开始前等待时间
@@ -84,9 +85,9 @@ Page({
     gameStatus = 0 //游戏进行状态
     guessStatus = 0
     aiMode = "freshman" //ai难度
-    playMode = "single" //游戏模，sigle是单人模式，multi是好友对战
+    playMode = "multi" //游戏模，sigle是单人模式，multi是好友对战
     isHost = true
-    myLoc = 1
+    myLoc = 0
     openId = ["123", "456", "789"]
     nickName = ["player1", "player2", "player3"]
     cardNameForBind = ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"]
@@ -94,13 +95,28 @@ Page({
       cardVisibleDict[cardNameForBind[i]] = false
     }
     if (playMode == "multi") {
-      initSocket()
+      let that=this
+      that.initSocket()
+      wx.login({
+        success(res) {
+          if (res.code) {
+            that.sendSocketMessage({
+              "action": "login",
+              "data": {
+                "code": res.code
+              }
+            })
+          } else {
+            console.log('登录失败！' + res.errMsg)
+          }
+        }
+      })
     }
     if (playMode == "multi" && isHost) {
       this.sendSocketMessage({
         "action": "startroomgame",
         "data": {
-          "openid": this.globalData.openid,
+          "openid": app.globalData.openid,
           "roomid": roomId
         }
       })
@@ -256,34 +272,34 @@ Page({
   },
   initSocket() {
     var that = this
-    that.globalData.localSocket = wx.connectSocket({
+    app.globalData.localSocket = wx.connectSocket({
       url: 'ws://120.78.169.154:8689/websocket'
     })
 
-    that.globalData.localSocket.onOpen(function(res) {
+    app.globalData.localSocket.onOpen(function(res) {
       console.log('WebSocket连接已打开！')
       socketOpen = true
       for (let i = 0; i < socketMsgQueue.length; i++) {
-        this.sendSocketMessage(socketMsgQueue[i])
+        that.sendSocketMessage(socketMsgQueue[i])
       }
       socketMsgQueue = []
     })
-    that.globalData.localSocket.onClose(function(res) {
+    app.globalData.localSocket.onClose(function(res) {
       console.log('close:', res)
     })
-    that.globalData.localSocket.onMessage(function(res) {
+    app.globalData.localSocket.onMessage(function(res) {
       console.log('message: ', res)
       var that = this
       var resData = JSON.parse(res.data)
       if (resData.action == "startroomgameres" || resData.action == "roomgamestarted") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
         for (i = 0; i < 4; i++)
-          if (resData.data.members[i].openid != that.globalData.openid) {
+          if (resData.data.members[i].openid != app.globalData.openid) {
             openId.push(resData.data.members[i].openid)
             nickName.push(resData.data.members[i].nickName)
             avatarUrl.push(resData.data.members[i].avatarUrl)
           }
       } else if (resData.action == "otherbroadcast") {
-        if (resData.content.openid == that.globalData.openid) {
+        if (resData.content.openid == app.globalData.openid) {
           content = resData.content
           if (content.type == "cardInfo") {
             myLoc = content.loc
@@ -308,12 +324,18 @@ Page({
             showTime = content.showTime
           }
         }
+      } else if (resData.action == "loginres"){
+        console.log(resData.data)
+        app.globalData.openid=resData.data.openid
+        console.log(app.globalData)
       }
     })
   },
   sendSocketMessage: function(msg) {
+    var that=this
     if (socketOpen) {
-      this.globalData.localSocket.send({
+      console.log(msg)
+      app.globalData.localSocket.send({
         data: JSON.stringify(msg)
       })
     } else {
@@ -336,7 +358,7 @@ Page({
         "roomid": roomId,
         "content": {
           "type": "cardInfo",
-          "openid": this.globalData.openid,
+          "openid": app.globalData.openid,
           "roomid": roomId,
           "content": {
             "openid": openId[i],
@@ -355,7 +377,7 @@ Page({
         "roomid": roomId,
         "content": {
           "type": "guessInfo",
-          "openid": this.globalData.openid,
+          "openid": app.globalData.openid,
           "roomid": roomId,
           "content": {
             "openid": openId[i],
@@ -376,7 +398,7 @@ Page({
         "roomid": roomId,
         "content": {
           "type": "stateInfo",
-          "openid": this.globalData.openid,
+          "openid": app.globalData.openid,
           "roomid": roomId,
           "content": {
             "openid": openId[i],
@@ -411,7 +433,6 @@ let cardArrayWhite = new Array() //总牌组
 let cardArrayBlack = new Array() //总牌组
 let cardArrayWhiteForBind = new Array()
 let cardArrayBlackForBind = new Array()
-const app = getApp()
 let player = new Array(4)
 player[0] = new oneplayer()
 player[1] = new oneplayer()
@@ -449,18 +470,20 @@ function changeState() {
   if (guessStatus > 0) {
     guessStatus -= 1
   } else {
-    if (playerNum == 4) {
-      if (gameStatus == 3) {
-        if (myLoc != 0) player[0].aiController()
-      } else if (gameStatus == 5) {
-        if (myLoc != 1) player[1].aiController()
-      } else if (gameStatus == 7) {
-        if (myLoc != 2) player[2].aiController()
-      } else if (gameStatus == 9) {
-        if (myLoc != 3) player[3].aiController()
+    if (playMode == "single") {
+      if (playerNum == 4) {      
+        if (gameStatus == 3) {
+          if (myLoc != 0) player[0].aiController()
+        } else if (gameStatus == 5) {
+          if (myLoc != 1) player[1].aiController()
+        } else if (gameStatus == 7) {
+          if (myLoc != 2) player[2].aiController()
+        } else if (gameStatus == 9) {
+          if (myLoc != 3) player[3].aiController()
+        }
+      } else {
+        //todo!
       }
-    } else {
-      //todo!
     }
   }
   if (showTime <= 0) {
