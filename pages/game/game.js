@@ -300,8 +300,8 @@ Page({
             avatarUrl.push(resData.data.members[i].avatarUrl)
           }
       } else if (resData.action == "otherbroadcast") {
-        if (resData.content.openid == app.globalData.openid) {
-          content = resData.content
+        if (resData.data.content.openid == app.globalData.openid) {
+          content = resData.data.content
           if (content.type == "cardInfo") {
             myLoc = content.loc
             cardArrayWhite = content.cardArrayWhite
@@ -356,13 +356,11 @@ Page({
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
-        "roomid": roomId,
-        "openid": app.globalData.openid,
-        "content": {
-          "type": "cardInfo",
+        "data": {
           "openid": app.globalData.openid,
           "roomid": roomId,
           "content": {
+            "type": "cardInfo",
             "openid": openId[i],
             "loc": i + 1,
             "cardArrayWhite": cardArrayWhite,
@@ -376,13 +374,11 @@ Page({
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
-        "roomid": roomId,
-        "openid": app.globalData.openid,
-        "content": {
-          "type": "guessInfo",
+        "data": {
           "openid": app.globalData.openid,
           "roomid": roomId,
           "content": {
+            "type": "guessInfo",
             "openid": openId[i],
             "playerLoc": myLoc,
             "guessPlayerLoc": guessPlayerLoc,
@@ -393,18 +389,16 @@ Page({
         }
       })
     }
-  },
+  }, 
   sendStateInfo: function() { //发送状态信息
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
         "action": "broadcast",
-        "roomid": roomId,
-        "openid": app.globalData.openid,
-        "content": {
-          "type": "stateInfo",
+        "data": {
           "openid": app.globalData.openid,
           "roomid": roomId,
           "content": {
+            "type": "stateInfo",
             "openid": openId[i],
             "gameStatus": gameStatus,
             "showTime": showTime
