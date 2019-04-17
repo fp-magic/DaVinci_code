@@ -74,7 +74,7 @@ Page({
     Left_time: 10,
   },
   /*刷新牌组显示
-   */ 
+   */
 
   onLoad(nowPage) {
     beginTime = 2 //游戏开始前等待时间
@@ -86,6 +86,7 @@ Page({
     guessStatus = 0
     aiMode = "freshman" //ai难度
     playMode = "multi" //游戏模，sigle是单人模式，multi是好友对战
+    roomId="123456"
     isHost = true
     myLoc = 0
     openId = ["123", "456", "789"]
@@ -95,7 +96,7 @@ Page({
       cardVisibleDict[cardNameForBind[i]] = false
     }
     if (playMode == "multi") {
-      let that=this
+      let that = this
       that.initSocket()
       wx.login({
         success(res) {
@@ -114,7 +115,7 @@ Page({
     }
     if (playMode == "multi" && isHost) {
       this.sendSocketMessage({
-        "action": "startroomgame",
+        "action": "getroominfo",
         "data": {
           "openid": app.globalData.openid,
           "roomid": roomId
@@ -273,7 +274,7 @@ Page({
   initSocket() {
     var that = this
     app.globalData.localSocket = wx.connectSocket({
-      url: 'ws://120.78.169.154:8689/websocket'
+      url: 'ws://127.0.0.1:8080/websocket'
     })
 
     app.globalData.localSocket.onOpen(function(res) {
@@ -291,7 +292,7 @@ Page({
       console.log('message: ', res)
       var that = this
       var resData = JSON.parse(res.data)
-      if (resData.action == "startroomgameres" || resData.action == "roomgamestarted") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
+      if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
         for (i = 0; i < 4; i++)
           if (resData.data.members[i].openid != app.globalData.openid) {
             openId.push(resData.data.members[i].openid)
@@ -324,15 +325,15 @@ Page({
             showTime = content.showTime
           }
         }
-      } else if (resData.action == "loginres"){
+      } else if (resData.action == "loginres") {
         console.log(resData.data)
-        app.globalData.openid=resData.data.openid
+        app.globalData.openid = resData.data.openid
         console.log(app.globalData)
       }
     })
   },
   sendSocketMessage: function(msg) {
-    var that=this
+    var that = this
     if (socketOpen) {
       console.log(msg)
       app.globalData.localSocket.send({
@@ -356,6 +357,7 @@ Page({
       this.sendSocketMessage({
         "action": "broadcast",
         "roomid": roomId,
+        "openid": app.globalData.openid,
         "content": {
           "type": "cardInfo",
           "openid": app.globalData.openid,
@@ -375,6 +377,7 @@ Page({
       this.sendSocketMessage({
         "action": "broadcast",
         "roomid": roomId,
+        "openid": app.globalData.openid,
         "content": {
           "type": "guessInfo",
           "openid": app.globalData.openid,
@@ -396,6 +399,7 @@ Page({
       this.sendSocketMessage({
         "action": "broadcast",
         "roomid": roomId,
+        "openid": app.globalData.openid,
         "content": {
           "type": "stateInfo",
           "openid": app.globalData.openid,
@@ -471,7 +475,7 @@ function changeState() {
     guessStatus -= 1
   } else {
     if (playMode == "single") {
-      if (playerNum == 4) {      
+      if (playerNum == 4) {
         if (gameStatus == 3) {
           if (myLoc != 0) player[0].aiController()
         } else if (gameStatus == 5) {
