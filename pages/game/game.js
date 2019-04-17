@@ -76,7 +76,7 @@ Page({
   /*刷新牌组显示
    */
 
-  onLoad(nowPage) {
+  onLoad(option) {
     beginTime = 2 //游戏开始前等待时间
     showTime = 5 //用于显示的当前状态剩余时间
     playTime = 10 //游戏内回合时间
@@ -86,9 +86,14 @@ Page({
     guessStatus = 0
     aiMode = "freshman" //ai难度
     playMode = "multi" //游戏模，sigle是单人模式，multi是好友对战
-    roomId="123456"
-    isHost = true
-    myLoc = 0
+    roomId=option.roomId
+    myLoc = Number(option.myLoc)
+    console.log(option)
+    if(myLoc==0){
+      isHost=true
+    }else{
+      isHost=false
+    }
     openId = ["123", "456", "789"]
     nickName = ["player1", "player2", "player3"]
     cardNameForBind = ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"]
@@ -98,35 +103,21 @@ Page({
     if (playMode == "multi") {
       let that = this
       that.initSocket()
-      wx.login({
-        success(res) {
-          if (res.code) {
-            that.sendSocketMessage({
-              "action": "login",
-              "data": {
-                "code": res.code
-              }
-            })
-          } else {
-            console.log('登录失败！' + res.errMsg)
-          }
-        }
-      })
-    }
-    if (playMode == "multi" && isHost) {
-      this.sendSocketMessage({
-        "action": "getroominfo",
-        "data": {
-          "openid": app.globalData.openid,
-          "roomid": roomId
-        }
-      })
     }
     if (isHost || playMode == "single") {
       changeState()
       cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
       cardArrayBlack = shuffleSwap(createArray(12))
-      if (playMode == "multi") this.sendCardInfo()
+      if (playMode == "multi" && isHost) {
+        this.sendSocketMessage({
+          "action": "getroominfo",
+          "data": {
+            "openid": app.globalData.openid,
+            "roomid": roomId
+          }
+        })
+      }
+      
       for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
       cardArrayWhiteForBind = countForBind(cardArrayWhite)
       cardArrayBlackForBind = countForBind(cardArrayBlack)
@@ -182,7 +173,7 @@ Page({
       cards_dict: cardVisibleDict,
       Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
       Left_time: showTime
-    })
+    }) 
   },
   refreshCardBind: function(e) {
     var that = this
@@ -198,6 +189,7 @@ Page({
         Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
         Left_time: showTime
       })
+      that.sendStateInfo()
       if (gameStatus == 3 + myLoc * 2) {
         that.setData({
           Ismyturn: true
@@ -208,7 +200,7 @@ Page({
           state_judge: false
         })
       }
-    }, 100)
+    }, 500)
   },
   onReady(e) {
     this.refreshCardBind()
@@ -295,10 +287,11 @@ Page({
       if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
         for (let i = 0; i < playerNum; i++)
           if (resData.data.members[i].openid != app.globalData.openid) {
-            openId.push(resData.data.members[i].openid)
-            nickName.push(resData.data.members[i].nickName)
-            avatarUrl.push(resData.data.members[i].avatarUrl)
+            openId[i]=resData.data.members[i].openid
+            nickName[i]=resData.data.members[i].nickName
+            avatarUrl[i]=resData.data.members[i].avatarUrl
           }
+        if (playMode == "multi") this.sendCardInfo()
       } else if (resData.action == "otherbroadcast") {
         if (resData.data.content.openid == app.globalData.openid) {
           content = resData.data.content
@@ -306,7 +299,7 @@ Page({
             myLoc = content.loc
             cardArrayWhite = content.cardArrayWhite
             cardArrayBlack = content.cardArrayBlack
-            this.onLoadAffiliate()
+            that.onLoadAffiliate()
           } else if (content.type == "guessInfo") {
             let playerLoc = content.playerLoc
             guessPlayerLoc = content.guessPlayerLoc
@@ -459,7 +452,7 @@ function shuffleSwap(arr) {
  */
 function changeState() {
   showTime -= 1
-  console.log(showTime, gameStatus, guessStatus, playerNum)
+  console.log(showTime, gameStatus)
   if (guessStatus > 0) {
     guessStatus -= 1
   } else {

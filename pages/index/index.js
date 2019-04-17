@@ -30,6 +30,20 @@ Page({
         }
       }
     })
+    
+  },
+  onGotUserInfo(){
+    wx.getSetting({
+      success(res) {
+        if (res.authSetting['scope.userInfo']) {
+          wx.getUserInfo({
+            success(res) {
+              app.globalData.userInfo=res.userInfo
+            } 
+          })
+        }
+      }
+    })
   },
   initSocket() {
     var that = this
