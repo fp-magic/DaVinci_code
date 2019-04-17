@@ -4,22 +4,21 @@ Page({
   data: {
 
   },
-  onLoad: function () {
-  },
-  friends: function (e) {
+  onLoad: function() {},
+  friends: function(e) {
     wx.navigateTo({
-      url: '../invitefriends/invitefriends?isHost=true&roomId='+roomId,
+      url: '../invitefriends/invitefriends?isHost=true&roomId=' + roomId,
     })
   },
   //调试用begin
-  friends_2: function (e) {
+  friends_2: function(e) {
     wx.navigateTo({
-      url: '../invitefriends/invitefriends?isHost=false&roomId='+roomId,
+      url: '../invitefriends/invitefriends?isHost=false&roomId=' + roomId,
     })
   },
   bindKeyInput(e) {
-    roomId=e.detail.value
-  }, 
+    roomId = e.detail.value
+  },
   //调试用end
 })
-let roomId="000000"
+let roomId = "000000"

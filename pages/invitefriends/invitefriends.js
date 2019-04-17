@@ -47,7 +47,7 @@ Page({
   },
   startgame: function(e) {
     wx.navigateTo({
-      url: '../game/game?myLoc='+myLoc+'&roomId='+roomId,
+      url: '../game/game?myLoc=' + myLoc + '&roomId=' + roomId + '&playMode=multi',
     })
   },
   initSocket() {
@@ -71,14 +71,14 @@ Page({
       console.log('message: ', res)
       var resData = JSON.parse(res.data)
       if (resData.action == "enterroomres") {
-        for (let i = 0; i < resData.members.length; i++)
+        for (let i = 0; i < resData.data.members.length; i++)
           if (resData.data.members[i].openid != app.globalData.openid) {
-            openId.push(resData.data.openid)
-            nickName.push(resData.data.nickName)
-            avatarUrl.push(resData.data.avatarUrl)
+            openId.push(resData.data.members[i].openid)
+            nickName.push(resData.data.members[i].nickName)
+            avatarUrl.push(resData.data.members[i].avatarUrl)
           }
-        myLoc = resData.members.length
-        openId.push(app.globalData.userInfo.openid)
+        myLoc = resData.data.members.length
+        openId.push(app.globalData.openid)
         nickName.push(app.globalData.userInfo.nickName)
         avatarUrl.push(app.globalData.userInfo.avatarUrl)        
       } else if (resData.action == "otherenterroom") {
@@ -95,7 +95,7 @@ Page({
           Room_id: roomId
         })
         myLoc = 0
-        openId.push(app.globalData.userInfo.openid)
+        openId.push(app.globalData.openid)
         nickName.push(app.globalData.userInfo.nickName)
         avatarUrl.push(app.globalData.userInfo.avatarUrl)  
       }

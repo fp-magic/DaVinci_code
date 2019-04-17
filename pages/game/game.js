@@ -77,6 +77,8 @@ Page({
    */
 
   onLoad(option) {
+    console.log(app.globalData)
+    let that = this
     beginTime = 2 //游戏开始前等待时间
     showTime = 5 //用于显示的当前状态剩余时间
     playTime = 10 //游戏内回合时间
@@ -85,14 +87,14 @@ Page({
     gameStatus = 0 //游戏进行状态
     guessStatus = 0
     aiMode = "freshman" //ai难度
-    playMode = "multi" //游戏模，sigle是单人模式，multi是好友对战
-    roomId=option.roomId
+    playMode = option.playMode //游戏模，sigle是单人模式，multi是好友对战
+    roomId = option.roomId
     myLoc = Number(option.myLoc)
     console.log(option)
-    if(myLoc==0){
-      isHost=true
-    }else{
-      isHost=false
+    if (myLoc == 0) {
+      isHost = true
+    } else {
+      isHost = false
     }
     openId = ["123", "456", "789"]
     nickName = ["player1", "player2", "player3"]
@@ -101,13 +103,13 @@ Page({
       cardVisibleDict[cardNameForBind[i]] = false
     }
     if (playMode == "multi") {
-      let that = this
       that.initSocket()
     }
     if (isHost || playMode == "single") {
       changeState()
       cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
       cardArrayBlack = shuffleSwap(createArray(12))
+      console.log(app.globalData, playMode, isHost)
       if (playMode == "multi" && isHost) {
         this.sendSocketMessage({
           "action": "getroominfo",
@@ -117,7 +119,7 @@ Page({
           }
         })
       }
-      
+
       for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
       cardArrayWhiteForBind = countForBind(cardArrayWhite)
       cardArrayBlackForBind = countForBind(cardArrayBlack)
@@ -173,7 +175,7 @@ Page({
       cards_dict: cardVisibleDict,
       Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
       Left_time: showTime
-    }) 
+    })
   },
   refreshCardBind: function(e) {
     var that = this
@@ -189,7 +191,6 @@ Page({
         Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
         Left_time: showTime
       })
-      that.sendStateInfo()
       if (gameStatus == 3 + myLoc * 2) {
         that.setData({
           Ismyturn: true
@@ -200,6 +201,9 @@ Page({
           state_judge: false
         })
       }
+      if (isHost) {
+        that.sendStateInfo()
+      }
     }, 500)
   },
   onReady(e) {
@@ -207,7 +211,6 @@ Page({
   },
   cardTouchEnd: function(e) { //之后配合前端进行修改
     if (gameStatus != 3 + myLoc * 2) return
-    console.log(e.target)
     let buttonId = e.target["id"]
     guessPlayerLoc = Number(buttonId[6]) - 1 //分别表示点击的玩家编号的牌的编号
     guessCardTrueName = buttonId.substring(7, buttonId.length) //之后配合前端进行修改
@@ -281,21 +284,27 @@ Page({
       console.log('close:', res)
     })
     app.globalData.localSocket.onMessage(function(res) {
-      console.log('message: ', res)
-      var that = this
+
       var resData = JSON.parse(res.data)
+      console.log('mssage: ', resData )
+      console.log(resData.action)
       if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
-        for (let i = 0; i < playerNum; i++)
+        let j = 0
+        for (let i = 0; i < resData.data.members.length; i++)
           if (resData.data.members[i].openid != app.globalData.openid) {
-            openId[i]=resData.data.members[i].openid
-            nickName[i]=resData.data.members[i].nickName
-            avatarUrl[i]=resData.data.members[i].avatarUrl
+            openId[j] = resData.data.members[i].openid
+            nickName[j] = resData.data.members[i].nickName
+            avatarUrl[j] = resData.data.members[i].avatarUrl
+            j += 1
           }
-        if (playMode == "multi") this.sendCardInfo()
+        if (playMode == "multi") that.sendCardInfo()
       } else if (resData.action == "otherbroadcast") {
-        if (resData.data.content.openid == app.globalData.openid) {
-          content = resData.data.content
+        console.log("otherbroadcast loaded in")
+        if (resData.data.openid == app.globalData.openid) {
+          let content = resData.data.content
+          console.log("otherbroadcast loaded")
           if (content.type == "cardInfo") {
+            console.log("cardinfo loaded")
             myLoc = content.loc
             cardArrayWhite = content.cardArrayWhite
             cardArrayBlack = content.cardArrayBlack
@@ -319,9 +328,9 @@ Page({
           }
         }
       } else if (resData.action == "loginres") {
-        console.log(resData.data)
         app.globalData.openid = resData.data.openid
-        console.log(app.globalData)
+      }else {
+        console.log("no entry message")
       }
     })
   },
