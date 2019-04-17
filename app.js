@@ -97,12 +97,8 @@ App({
     }
   },*/
   globalData: {
-    userInfo: null
-  }
-  // 与服务端交互预留接口
-  /*globalData: {
     userInfo: null,
     openid: {},
     localSocket: {}
-  }*/
+  }
 })

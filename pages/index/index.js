@@ -14,37 +14,73 @@ Page({
     })
   },
   onLoad: function () {
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      })
-    } else if (this.data.canIUse){
-      app.userInfoReadyCallback = res => {
+    var that=this
+    that.initSocket()
+    wx.login({
+      success(res) {
+        if (res.code) {
+          that.sendSocketMessage({
+            "action": "login",
+            "data": {
+              "code": res.code
+            }
+          })
+        } else {
+          console.log('登录失败！' + res.errMsg)
+        }
+      }
+    })
+  },
+  initSocket() {
+    var that = this
+    app.globalData.localSocket = wx.connectSocket({
+      url: 'ws://127.0.0.1:8080/websocket'
+    })
+
+    app.globalData.localSocket.onOpen(function (res) {
+      console.log('WebSocket连接已打开！')
+      socketOpen = true
+      for (let i = 0; i < socketMsgQueue.length; i++) {
+        that.sendSocketMessage(socketMsgQueue[i])
+      }
+      socketMsgQueue = []
+    })
+    app.globalData.localSocket.onClose(function (res) {
+      console.log('close:', res)
+    })
+    app.globalData.localSocket.onMessage(function (res) {
+      console.log('message: ', res)
+      var that = this
+      var resData = JSON.parse(res.data)
+      if (resData.action == "getroominfores") {
+
+      } else if (resData.action == "otherbroadcast") {
+
+      } else if (resData.action == "loginres") {
+        app.globalData.openid = resData.data.openid
+      } else if (resData.action == "createroomres") {
+        roomId = resData.data.roomid
         this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
+          Room_id: roomId
         })
       }
-    } else {
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
-        }
+    })
+  },
+  sendSocketMessage: function (msg) {
+    var that = this
+    if (socketOpen) {
+      console.log(msg)
+      app.globalData.localSocket.send({
+        data: JSON.stringify(msg)
       })
+    } else {
+      socketMsgQueue.push(msg)
     }
   },
-  getUserInfo: function(e) {
-    console.log(e)
-    app.globalData.userInfo = e.detail.userInfo
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
-    })
+  globalData: {
+    userInfo: null,
+    openid: {},
+    localSocket: {}
   },
   mode1tap: function(e) {
     wx.navigateTo({
@@ -72,3 +108,5 @@ Page({
     })
   }
 })
+let socketOpen
+let socketMsgQueue = new Array()

@@ -236,7 +236,7 @@ Page({
     guessCons = player[(guessPlayerLoc + myLoc) % 4].guessedJudge(guessCardName, guessCardTrueName) //获取猜牌结果
     if (playMode == "single") { //单人模式直接判断
       if (guessCons == true) {
-        player[myLoc].succussJudge()
+        player[myLoc].successJudge()
         this.setData({
           Isjudgeright: true
         })
@@ -248,7 +248,7 @@ Page({
       }
     } else if (playMode == "multi") { //多人模式将结果发给其他所有玩家
       if (guessCons == true) {
-        player[myLoc].succussJudge()
+        player[myLoc].successJudge()
         this.setData({
           Isjudgeright: true
         })
@@ -293,7 +293,7 @@ Page({
       var that = this
       var resData = JSON.parse(res.data)
       if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
-        for (i = 0; i < 4; i++)
+        for (let i = 0; i < playerNum; i++)
           if (resData.data.members[i].openid != app.globalData.openid) {
             openId.push(resData.data.members[i].openid)
             nickName.push(resData.data.members[i].nickName)
@@ -315,7 +315,7 @@ Page({
             guessCons = content.guessCons
             player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
             if (guessCons) {
-              player[playerLoc].succussJudge()
+              player[playerLoc].successJudge()
             } else {
               player[playerLoc].failJudge()
             }
@@ -342,11 +342,6 @@ Page({
     } else {
       socketMsgQueue.push(msg)
     }
-  },
-  globalData: {
-    userInfo: null,
-    openid: {},
-    localSocket: {}
   },
   sendCardInfo: function() { //发送牌堆信息，只有主机可以调用
     if (myLoc != 0) {
@@ -389,7 +384,7 @@ Page({
         }
       })
     }
-  }, 
+  },
   sendStateInfo: function() { //发送状态信息
     for (let i = 0; i < 3; i++) {
       this.sendSocketMessage({
@@ -662,7 +657,7 @@ oneplayer.prototype.guessedJudge = function(guessingCardName, guessingCardTrueNa
 }
 /*猜牌成功的情况
  */
-oneplayer.prototype.succussJudge = function() {
+oneplayer.prototype.successJudge = function() {
   showTime = playTime
 }
 /*猜牌失败的情况
@@ -710,7 +705,7 @@ oneplayer.prototype.aiController = function() {
       guessCons = player[3].guessedJudge(guessCardName, guessCardTrueName)
     }
     if (guessCons == true) {
-      this.succussJudge()
+      this.successJudge()
     } else {
       this.failJudge()
     }

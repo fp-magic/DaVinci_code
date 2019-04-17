@@ -20,22 +20,32 @@ Page({
       nickname: "等待玩家4进入",
     }
   },
-  onLoad(nowPage){
+  onLoad:function(option){
+    console.log(option)
+    var that=this
+    console.log(app.globalData)
     openId=new Array()
     nickName=new Array()
     avatarUrl=new Array()
-    roomId=""//配合前端修改，非主机时为前一页面导入
-    isHost=true//配合前端修改，应该是前一页面导入
-    this.initSocket()
-    if(isHost){
-      this.sendCreateInfo()
+    if(option.isHost=="true"){
+      isHost=true
     }else{
-      this.sendEnterInfo()
-      this.setData({
+      roomId = Number(option.roomId)
+      isHost=false
+    }
+    that.initSocket()
+    console.log(isHost)
+    if(isHost=="true"){
+      console.log("?")
+      that.sendCreateInfo()
+    }else{
+      console.log("!")
+      that.sendEnterInfo()
+      that.setData({
         Room_id:roomId
       })
     }
-  },
+  }, 
   startgame: function(e){
     wx.navigateTo({
       url: '../game/game',
@@ -60,7 +70,6 @@ Page({
     })
     app.globalData.localSocket.onMessage(function (res) {
       console.log('message: ', res)
-      var that = this
       var resData = JSON.parse(res.data)
       if (resData.action == "getroominfores") {
         for (i = 0; i < resData.members.length; i++)
@@ -77,7 +86,7 @@ Page({
         console.log(app.globalData)
       }else if(resData.action=="createroomres"){
         roomId=resData.data.roomid
-        this.setData({
+        that.setData({
           Room_id:roomId
         })
       }
@@ -107,18 +116,11 @@ Page({
     this.sendSocketMessage({
       "action": "createroom",
       "data": {
-        "openid":app.globalData.openId,
+        "openid":app.globalData.openid,
         "roomcapacity": 4
       }
     })
-  },
-  globalData: {
-    userInfo: null,
-    openid: {},
-    localSocket: {}
-  }
-
-  
+  },  
 })
 let openId
 let nickName
