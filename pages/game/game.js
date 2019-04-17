@@ -2,15 +2,22 @@ const app = getApp()
 Page({
   data: {
 
-    player1_avatar: "/images/头像.jpg",
-    player2_avatar: "/images/头像.jpg",
-    player3_avatar: "/images/头像.jpg",
-    player4_avatar: "/images/头像.jpg",
-    player1_nickname: "I'mplayer1",
-    player2_nickname: "I'mplayer2",
-    player3_nickname: "I'mplayer3",
-    player4_nickname: "I'mPlayer4",
-
+    playerInfo_1: {
+      avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
+      nickname: "玩家一",
+    },
+    playerInfo_2: {
+      avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
+      nickname: "等待玩家2进入",
+    },
+    playerInfo_3: {
+      avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
+      nickname: "等待玩家3进入",
+    },
+    playerInfo_4: {
+      avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
+      nickname: "等待玩家4进入",
+    },
 
     white_wait: ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11"],
     black_left: ["black0", "black5", "black6", "black7", "black8", "black9", "blackjoker"],

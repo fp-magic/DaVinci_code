@@ -32,20 +32,22 @@
 }
 
 .placeholder {
-  height:130px;
+  height:100px;
 }
 
 .gamemode {
   display:flex;
-  flex-direction:row;
+  flex-direction:column;
+  height: 400rpx;
+  justify-content: space-between;
 }
 
 .gamemodebutton {
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100px;
-  width:100px;
+  height:50px;
+  width:200px;
 }
 
 .menu {
