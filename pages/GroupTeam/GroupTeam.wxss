@@ -1,9 +1,8 @@
 .choose{
-    margin-left: 50rpx;
-  margin-top: 400rpx;
-  margin-right: 50rpx;
+  margin-top: 100rpx;
+  height: 700rpx;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-around;
 }
 
@@ -15,9 +14,8 @@
  .choose_image2{
   width: 210rpx;
   height: 210rpx;
-
 }
 
 .choose_button{
-  background-color:papayawhip;
+  width: 400rpx;
 }

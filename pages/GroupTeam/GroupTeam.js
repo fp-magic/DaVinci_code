@@ -16,6 +16,16 @@ Page({
       url: '../invitefriends/invitefriends?isHost=false&roomId=' + roomId,
     })
   },
+  joinroom: function(e){
+    wx.navigateTo({
+      url: '../JoinRoom/JoinRoom',
+    })
+  },
+  ConsoleGame: function (e) {
+    wx.navigateTo({
+      url: '../game/game',
+    })
+  },
   bindKeyInput(e) {
     roomId = e.detail.value
   },
