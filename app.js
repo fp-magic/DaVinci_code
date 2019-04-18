@@ -53,16 +53,20 @@ App({
     wx.onSocketOpen(function (res) {
       console.log('WebSocket连接已打开！')
       that.globalData.socketOpen = true
+      that.globalData.reconnectnum = 0
       for (let i = 0; i < that.globalData.socketMsgQueue.length; i++) {
         sendSocketMessage(that.globalData.socketMsgQueue[i])
       }
       that.globalData.socketMsgQueue = []
     })
     wx.onSocketClose(function (res) {
-      console.log('reconnect')
-      that.globalData.localSocket = wx.connectSocket({
-        url: 'ws://127.0.0.1:8080/websocket'
-      })
+      that.globalData.reconnectnum++
+      if (that.globalData.reconnectnum <= 5){
+        console.log('第',that.globalData.reconnectnum,'次 reconnect')
+        that.globalData.localSocket = wx.connectSocket({
+          url: 'ws://127.0.0.1:8080/websocket'
+        })
+      }
     })
     wx.onSocketMessage(function (res) {
       console.log('message: ', res)
@@ -100,6 +104,7 @@ App({
     openid: {},
     localSocket: {},
     socketOpen: null,
-    socketMsgQueue :[]
+    socketMsgQueue :[],
+    reconnectnum: 0
   }
 })

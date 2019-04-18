@@ -109,16 +109,13 @@ Page({
     for (let i = 0; i < cardNameForBind.length; i++) {
       cardVisibleDict[cardNameForBind[i]] = false
     }
-    if (playMode == "multi") {
-      that.initSocket()
-    }
     if (isHost || playMode == "single") {
       changeState()
       cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
       cardArrayBlack = shuffleSwap(createArray(12))
       console.log(app.globalData, playMode, isHost)
       if (playMode == "multi" && isHost) {
-        this.sendSocketMessage({
+        app.sendSocketMessage({
           "action": "getroominfo",
           "data": {
             "openid": app.globalData.openid,
@@ -273,38 +270,14 @@ Page({
   endMyTurn: function(e) {
     showTime = 1
   },
-  initSocket() {
+  onShow() {
     var that = this
-    app.globalData.localSocket.onOpen(function(res) {
-      console.log('WebSocket连接已打开！')
-      socketOpen = true
-      for (let i = 0; i < socketMsgQueue.length; i++) {
-        that.sendSocketMessage(socketMsgQueue[i])
-      }
-      socketMsgQueue = []
-    })
-    app.globalData.localSocket.onClose(function(res) {
-      console.log('close:', res)
-    })
-    app.globalData.localSocket.onMessage(function(res) {
-
+    wx.onSocketMessage(function (res) {
       var resData = JSON.parse(res.data)
       console.log('mssage: ', resData)
       console.log(resData.action)
       that.solveMessage(resData)
-      
     })
-  },
-  sendSocketMessage: function(msg) {
-    var that = this
-    if (socketOpen) {
-      console.log(msg)
-      app.globalData.localSocket.send({
-        data: JSON.stringify(msg)
-      })
-    } else {
-      socketMsgQueue.push(msg)
-    }
   },
   solveMessage:function(resData){
     if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
@@ -316,7 +289,7 @@ Page({
           avatarUrl[j] = resData.data.members[i].avatarUrl
           j += 1
         }
-      if (playMode == "multi") that.sendCardInfo()
+      if (playMode == "multi") this.sendCardInfo()
     } else if (resData.action == "otherbroadcast") {
       console.log("otherbroadcast loaded in")
       if (resData.data.openid == app.globalData.openid) {
@@ -360,7 +333,7 @@ Page({
       return
     }
     for (let i = 0; i < 3; i++) {
-      this.sendSocketMessage({
+      app.sendSocketMessage({
         "action": "broadcast",
         "data": {
           "openid": app.globalData.openid,
@@ -378,7 +351,7 @@ Page({
   },
   sendGuessInfo: function() { //发送猜牌信息
     for (let i = 0; i < 3; i++) {
-      this.sendSocketMessage({
+      app.sendSocketMessage({
         "action": "broadcast",
         "data": {
           "openid": app.globalData.openid,
@@ -398,7 +371,7 @@ Page({
   },
   sendStateInfo: function() { //发送状态信息
     for (let i = 0; i < 3; i++) {
-      this.sendSocketMessage({
+      app.sendSocketMessage({
         "action": "broadcast",
         "data": {
           "openid": app.globalData.openid,
@@ -444,8 +417,6 @@ player[2] = new oneplayer()
 player[3] = new oneplayer()
 let cardNameForBind = new Array(24)
 let cardVisibleDict = new Object()
-let socketOpen
-let socketMsgQueue = new Array()
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
