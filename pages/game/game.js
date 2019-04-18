@@ -208,7 +208,7 @@ Page({
       if (isHost) {
         that.sendStateInfo()
       }
-    }, 200)
+    }, 500)
   },
   onReady(e) {
     
@@ -292,33 +292,31 @@ Page({
       if (playMode == "multi") this.sendCardInfo()
     } else if (resData.action == "otherbroadcast") {
       console.log("otherbroadcast loaded in")
-      if (resData.data.openid == app.globalData.openid) {
-        let content = resData.data.content
-        console.log("otherbroadcast loaded")
-        if (content.type == "cardInfo") {
-          console.log("cardinfo loaded")
-          myLoc = content.loc
-          cardArrayWhite = content.cardArrayWhite
-          cardArrayBlack = content.cardArrayBlack
-          that.onLoadAffiliate()
-        } else if (content.type == "guessInfo") {
-          let playerLoc = content.playerLoc
-          guessPlayerLoc = content.guessPlayerLoc
-          guessCardName = content.guessCardName
-          guessCardTrueName = content.guessCardTrueName
-          guessCons = content.guessCons
-          player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
-          if (guessCons) {
-            player[playerLoc].successJudge()
-          } else {
-            player[playerLoc].failJudge()
-          }
-        } else if (content.type == "stateInfo") {
-          if (!isHost) {
-            if (gameStatus != content.gameStatus) solveStateChange()
-            gameStatus = content.gameStatus
-            showTime = content.showTime
-          }
+      let content = resData.data.content
+      console.log("otherbroadcast loaded")
+      if (content.type == "cardInfo") {
+        console.log("cardinfo loaded")
+        myLoc = content.loc
+        cardArrayWhite = content.cardArrayWhite
+        cardArrayBlack = content.cardArrayBlack
+        that.onLoadAffiliate()
+      } else if (content.type == "guessInfo") {
+        let playerLoc = content.playerLoc
+        guessPlayerLoc = content.guessPlayerLoc
+        guessCardName = content.guessCardName
+        guessCardTrueName = content.guessCardTrueName
+        guessCons = content.guessCons
+        player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
+        if (guessCons) {
+          player[playerLoc].successJudge()
+        } else {
+          player[playerLoc].failJudge()
+        }
+      } else if (content.type == "stateInfo") {
+        if (!isHost) {
+          if (gameStatus != content.gameStatus) solveStateChange()
+          gameStatus = content.gameStatus
+          showTime = content.showTime
         }
       }
     } else if (resData.action == "loginres") {
@@ -332,59 +330,50 @@ Page({
       console.error("the cardInfo is not sent by host player!")
       return
     }
-    for (let i = 0; i < 3; i++) {
-      app.sendSocketMessage({
-        "action": "broadcast",
-        "data": {
-          "openid": app.globalData.openid,
-          "roomid": roomId,
-          "content": {
-            "type": "cardInfo",
-            "openid": openId[i],
-            "loc": i + 1,
-            "cardArrayWhite": cardArrayWhite,
-            "cardArrayBlack": cardArrayBlack
-          }
+    app.sendSocketMessage({
+      "action": "broadcast",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId,
+        "content": {
+          "type": "cardInfo",
+          "loc": i + 1,
+          "cardArrayWhite": cardArrayWhite,
+          "cardArrayBlack": cardArrayBlack
         }
-      })
-    }
+      }
+    })
   },
   sendGuessInfo: function() { //发送猜牌信息
-    for (let i = 0; i < 3; i++) {
-      app.sendSocketMessage({
-        "action": "broadcast",
-        "data": {
-          "openid": app.globalData.openid,
-          "roomid": roomId,
-          "content": {
-            "type": "guessInfo",
-            "openid": openId[i],
-            "playerLoc": myLoc,
-            "guessPlayerLoc": guessPlayerLoc,
-            "guessCardName": guessCardName,
-            "guessCardTrueName": guessCardTrueName,
-            "guessCons": guessCons,
-          }
+    app.sendSocketMessage({
+      "action": "broadcast",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId,
+        "content": {
+          "type": "guessInfo",
+          "playerLoc": myLoc,
+          "guessPlayerLoc": guessPlayerLoc,
+          "guessCardName": guessCardName,
+          "guessCardTrueName": guessCardTrueName,
+          "guessCons": guessCons,
         }
-      })
-    }
+      }
+    })
   },
   sendStateInfo: function() { //发送状态信息
-    for (let i = 0; i < 3; i++) {
-      app.sendSocketMessage({
-        "action": "broadcast",
-        "data": {
-          "openid": app.globalData.openid,
-          "roomid": roomId,
-          "content": {
-            "type": "stateInfo",
-            "openid": openId[i],
-            "gameStatus": gameStatus,
-            "showTime": showTime
-          }
+    app.sendSocketMessage({
+      "action": "broadcast",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId,
+        "content": {
+          "type": "stateInfo",
+          "gameStatus": gameStatus,
+          "showTime": showTime
         }
-      })
-    }
+      }
+    })
   }
 })
 let beginTime, showTime //进入时间,倒计时用时间
