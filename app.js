@@ -99,6 +99,8 @@ App({
   globalData: {
     userInfo: null,
     openid: {},
-    localSocket: {}
+    localSocket: {},
+    socketOpen: null,
+    socketMsgQueue :[]
   }
 })

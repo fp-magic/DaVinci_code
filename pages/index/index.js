@@ -47,48 +47,49 @@ Page({
   },
   initSocket() {
     var that = this
+    console.log("in index.js")
     app.globalData.localSocket = wx.connectSocket({
       url: 'ws://127.0.0.1:8080/websocket'
     })
 
     app.globalData.localSocket.onOpen(function (res) {
       console.log('WebSocket连接已打开！')
-      socketOpen = true
-      for (let i = 0; i < socketMsgQueue.length; i++) {
-        that.sendSocketMessage(socketMsgQueue[i])
+      app.globalData.socketOpen = true
+      for (let i = 0; i < app.globalData.socketMsgQueue.length; i++) {
+        that.sendSocketMessage(app.globalData.socketMsgQueue[i])
       }
-      socketMsgQueue = []
+      app.globalData.socketMsgQueue = []
     })
     app.globalData.localSocket.onClose(function (res) {
       console.log('close:', res)
     })
     app.globalData.localSocket.onMessage(function (res) {
       console.log('message: ', res)
-      var that = this
       var resData = JSON.parse(res.data)
-      if (resData.action == "getroominfores") {
-
-      } else if (resData.action == "otherbroadcast") {
-
-      } else if (resData.action == "loginres") {
-        app.globalData.openid = resData.data.openid
-      } else if (resData.action == "createroomres") {
-        roomId = resData.data.roomid
-        this.setData({
-          Room_id: roomId
-        })
-      }
+      that.solveMessage(resData)
+      
     })
   },
   sendSocketMessage: function (msg) {
     var that = this
-    if (socketOpen) {
+    if (app.globalData.socketOpen) {
       console.log(msg)
       app.globalData.localSocket.send({
         data: JSON.stringify(msg)
       })
     } else {
-      socketMsgQueue.push(msg)
+      app.globalData.socketMsgQueue.push(msg)
+    }
+  },
+  solveMessage: function(resData){
+    console.log("in index.js")
+    if (resData.action == "getroominfores") {
+
+    } else if (resData.action == "otherbroadcast") {
+
+    } else if (resData.action == "loginres") {
+      app.globalData.openid = resData.data.openid
+    } else if (resData.action == "createroomres") {
     }
   },
   globalData: {
@@ -122,5 +123,3 @@ Page({
     })
   }
 })
-let socketOpen
-let socketMsgQueue = new Array()

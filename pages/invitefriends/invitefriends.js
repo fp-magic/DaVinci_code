@@ -46,71 +46,88 @@ Page({
     this.refreshRoomShow()
   },
   startgame: function(e) {
+    this.sendSocketMessage({
+      "action": "startroomgame",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId
+      }
+    })
     wx.navigateTo({
       url: '../game/game?myLoc=' + myLoc + '&roomId=' + roomId + '&playMode=multi',
     })
   },
   initSocket() {
     var that = this
-    app.globalData.localSocket = wx.connectSocket({
-      url: 'ws://127.0.0.1:8080/websocket'
-    })
-
+    console.log("in invitefriends.js")
     app.globalData.localSocket.onOpen(function(res) {
       console.log('WebSocket连接已打开！')
-      socketOpen = true
-      for (let i = 0; i < socketMsgQueue.length; i++) {
-        that.sendSocketMessage(socketMsgQueue[i])
+      app.globalData.socketOpen = true
+      for (let i = 0; i < app.globalData.socketMsgQueue.length; i++) {
+        that.sendSocketMessage(app.globalData.socketMsgQueue[i])
       }
-      socketMsgQueue = []
+      app.globalData.socketMsgQueue = []
     })
     app.globalData.localSocket.onClose(function(res) {
       console.log('close:', res)
     })
     app.globalData.localSocket.onMessage(function(res) {
-      console.log('message: ', res)
+      console.log('mesage: ', res)
       var resData = JSON.parse(res.data)
-      if (resData.action == "enterroomres") {
-        for (let i = 0; i < resData.data.members.length; i++)
-          if (resData.data.members[i].openid != app.globalData.openid) {
-            openId.push(resData.data.members[i].openid)
-            nickName.push(resData.data.members[i].nickName)
-            avatarUrl.push(resData.data.members[i].avatarUrl)
-          }
-        myLoc = resData.data.members.length
-        openId.push(app.globalData.openid)
-        nickName.push(app.globalData.userInfo.nickName)
-        avatarUrl.push(app.globalData.userInfo.avatarUrl)        
-      } else if (resData.action == "otherenterroom") {
-        openId.push(resData.data.openid)
-        nickName.push(resData.data.nickName)
-        avatarUrl.push(resData.data.avatarUrl)
-      } else if (resData.action == "loginres") {
-        console.log(resData.data)
-        app.globalData.openid = resData.data.openid
-        console.log(app.globalData)
-      } else if (resData.action == "createroomres") {
-        roomId = resData.data.roomid
-        that.setData({
-          Room_id: roomId
-        })
-        myLoc = 0
-        openId.push(app.globalData.openid)
-        nickName.push(app.globalData.userInfo.nickName)
-        avatarUrl.push(app.globalData.userInfo.avatarUrl)  
-      }
-      console.log("myLoc:",myLoc)
+      console.log("that",that)
+      console.log("this",this)
+      console
+      that.solveMessages(resData)
     })
   },
   sendSocketMessage: function(msg) {
     var that = this
-    if (socketOpen) {
+    if (app.globalData.socketOpen) {
       console.log(msg)
       app.globalData.localSocket.send({
         data: JSON.stringify(msg)
       })
     } else {
-      socketMsgQueue.push(msg)
+      app.globalData.socketMsgQueue.push(msg)
+    }
+  },
+  solveMessages:function(resData){
+    let that=this
+    console.log("in invitefriends.js")
+    if (resData.action == "enterroomres") {
+      for (let i = 0; i < resData.data.members.length; i++)
+        if (resData.data.members[i].openid != app.globalData.openid) {
+          openId.push(resData.data.members[i].openid)
+          nickName.push(resData.data.members[i].nickName)
+          avatarUrl.push(resData.data.members[i].avatarUrl)
+        }
+      myLoc = resData.data.members.length
+      openId.push(app.globalData.openid)
+      nickName.push(app.globalData.userInfo.nickName)
+      avatarUrl.push(app.globalData.userInfo.avatarUrl)
+    } else if (resData.action == "otherenterroom") {
+      openId.push(resData.data.openid)
+      nickName.push(resData.data.nickName)
+      avatarUrl.push(resData.data.avatarUrl)
+    } else if (resData.action == "loginres") {
+      console.log(resData.data)
+      app.globalData.openid = resData.data.openid
+      console.log(app.globalData)
+    } else if (resData.action == "createroomres") {
+      roomId = resData.data.roomid
+      that.setData({
+        Room_id: roomId
+      })
+      myLoc = 0
+      openId.push(app.globalData.openid)
+      nickName.push(app.globalData.userInfo.nickName)
+      avatarUrl.push(app.globalData.userInfo.avatarUrl)
+    } else if (resData.action == "roomgamestarted") {
+      if (myLoc <= 3 && myLoc >= 1) {
+        wx.navigateTo({
+          url: '../game/game?myLoc=' + myLoc + '&roomId=' + roomId + '&playMode=multi',
+        })
+      }
     }
   },
   sendEnterInfo: function() {

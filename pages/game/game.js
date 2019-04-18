@@ -211,7 +211,7 @@ Page({
       if (isHost) {
         that.sendStateInfo()
       }
-    }, 500)
+    }, 5000)
   },
   onReady(e) {
     this.refreshCardBind()
@@ -275,10 +275,6 @@ Page({
   },
   initSocket() {
     var that = this
-    app.globalData.localSocket = wx.connectSocket({
-      url: 'ws://127.0.0.1:8080/websocket'
-    })
-
     app.globalData.localSocket.onOpen(function(res) {
       console.log('WebSocket连接已打开！')
       socketOpen = true
@@ -293,8 +289,9 @@ Page({
     app.globalData.localSocket.onMessage(function(res) {
 
       var resData = JSON.parse(res.data)
-      console.log('mssage: ', resData )
+      console.log('mssage: ', resData)
       console.log(resData.action)
+
       if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
         let j = 0
         for (let i = 0; i < resData.data.members.length; i++)
@@ -329,14 +326,16 @@ Page({
               player[playerLoc].failJudge()
             }
           } else if (content.type == "stateInfo") {
-            if (gameStatus != content.gameStatus) solveStateChange()
-            gameStatus = content.gameStatus
-            showTime = content.showTime
+            if (!isHost) {
+              if (gameStatus != content.gameStatus) solveStateChange()
+              gameStatus = content.gameStatus
+              showTime = content.showTime
+            }
           }
         }
       } else if (resData.action == "loginres") {
         app.globalData.openid = resData.data.openid
-      }else {
+      } else {
         console.log("no entry message")
       }
     })
@@ -495,7 +494,7 @@ function changeState() {
       gameStatus = 2
     }
   }
-  let timer = setTimeout(changeState, 1000)
+  let timer = setTimeout(changeState, 10000)
 }
 
 function solveStateChange() {

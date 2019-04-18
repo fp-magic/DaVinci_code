@@ -23,7 +23,7 @@ Page({
   },
   ConsoleGame: function (e) {
     wx.navigateTo({
-      url: '../game/game',
+      url: '../game/game?playMode=single&myLoc=0',
     })
   },
   bindKeyInput(e) {
