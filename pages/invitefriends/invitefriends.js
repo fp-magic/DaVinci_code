@@ -53,13 +53,15 @@ Page({
     this.refreshRoomShow()
   },
   startgame: function(e) {
-    app.sendSocketMessage({
-      "action": "startroomgame",
-      "data": {
-        "openid": app.globalData.openid,
-        "roomid": roomId
-      }
-    })
+    if(myLoc==0){
+      app.sendSocketMessage({
+        "action": "startroomgame",
+        "data": {
+          "openid": app.globalData.openid,
+          "roomid": roomId
+        }
+      })
+    }
     wx.navigateTo({
       url: '../game/game?myLoc=' + myLoc + '&roomId=' + roomId + '&playMode=multi',
     })

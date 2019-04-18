@@ -113,6 +113,10 @@ Page({
       changeState()
       cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
       cardArrayBlack = shuffleSwap(createArray(12))
+      randomArray=shuffleSwap(createArray(48))
+      for(let i=0;i<randomArray.length;i++){
+        randomArray[i]=randomArray[i]%2+1
+      }
       console.log(app.globalData, playMode, isHost)
       if (playMode == "multi" && isHost) {
         app.sendSocketMessage({
@@ -123,12 +127,11 @@ Page({
           }
         })
       }
-
+      console.log(cardArrayWhite, cardArrayBlack, randomArray)
+      if (playMode == "multi") this.sendCardInfo()
       for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
       cardArrayWhiteForBind = countForBind(cardArrayWhite)
       cardArrayBlackForBind = countForBind(cardArrayBlack)
-      console.log(cardArrayWhite, cardArrayBlack)
-
       if (playerNum == 4) { //发牌
         for (let i = 0; i < 3; i++) player[0].getCard(0)
         for (let i = 0; i < 3; i++) player[1].getCard(0)
@@ -280,6 +283,7 @@ Page({
     })
   },
   solveMessage:function(resData){
+    var that=this
     if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
       let j = 0
       for (let i = 0; i < resData.data.members.length; i++)
@@ -289,16 +293,16 @@ Page({
           avatarUrl[j] = resData.data.members[i].avatarUrl
           j += 1
         }
-      if (playMode == "multi") this.sendCardInfo()
+      
     } else if (resData.action == "otherbroadcast") {
       console.log("otherbroadcast loaded in")
       let content = resData.data.content
       console.log("otherbroadcast loaded")
       if (content.type == "cardInfo") {
         console.log("cardinfo loaded")
-        myLoc = content.loc
         cardArrayWhite = content.cardArrayWhite
         cardArrayBlack = content.cardArrayBlack
+        randomArray=content.randomArray
         that.onLoadAffiliate()
       } else if (content.type == "guessInfo") {
         let playerLoc = content.playerLoc
@@ -337,9 +341,9 @@ Page({
         "roomid": roomId,
         "content": {
           "type": "cardInfo",
-          "loc": i + 1,
           "cardArrayWhite": cardArrayWhite,
-          "cardArrayBlack": cardArrayBlack
+          "cardArrayBlack": cardArrayBlack,
+          "randomArray":randomArray
         }
       }
     })
@@ -399,6 +403,7 @@ let cardArrayWhite = new Array() //总牌组
 let cardArrayBlack = new Array() //总牌组
 let cardArrayWhiteForBind = new Array()
 let cardArrayBlackForBind = new Array()
+let randomArray=new Array()//随机数数组
 let player = new Array(4)
 player[0] = new oneplayer()
 player[1] = new oneplayer()
@@ -576,7 +581,7 @@ oneplayer.prototype.setGotCard = function(ifGotCard) {
 oneplayer.prototype.getCard = function(getCardMod) {
   if (cardArrayWhite.length <= 0 && cardArrayWhite.length <= 0) return
   if (getCardMod != 1 && getCardMod != 2) {
-    getCardMod = Math.floor(Math.random() * (2)) + 1
+    getCardMod = randomArray.pop()
   }
   if (getCardMod == 1 && cardArrayWhite.length <= 0) getCardMod = 2
   if (getCardMod == 2 && cardArrayBlack.length <= 0) getCardMod = 1
