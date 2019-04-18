@@ -1,9 +1,5 @@
 //app.js
 
-// 与服务端交互预留接口
-//var socketOpen = false
-//var socketMsgQueue = []
-
 App({
   onLaunch: function () {
     // 展示本地存储能力
@@ -12,19 +8,18 @@ App({
     wx.setStorageSync('logs', logs)
 
     // 与服务端交互预留接口
-    //this.initSocket()
+    this.initSocket()
 
     // 登录
     wx.login({
       success: res => {
         // 发送 res.code 到后台换取 openId, sessionKey, unionId
-        // 与服务端交互预留接口
-        /*this.sendSocketMessage({
+        this.sendSocketMessage({
           "action": "login",
           "data": {
             "code": res.code
           }
-        })*/
+        })
       }
     })
     // 获取用户信息
@@ -49,26 +44,30 @@ App({
     })
   },
   // 与服务端交互预留接口
-  /*initSocket() {
+  initSocket() {
     var that = this
     that.globalData.localSocket = wx.connectSocket({
-      url: 'ws://10.0.2.2:8080/websocket'
+      url: 'ws://127.0.0.1:8080/websocket'
     })
 
-    that.globalData.localSocket.onOpen(function (res) {
+    wx.onSocketOpen(function (res) {
       console.log('WebSocket连接已打开！')
-      socketOpen = true
-      for (let i = 0; i < socketMsgQueue.length; i++) {
-        sendSocketMessage(socketMsgQueue[i])
+      that.globalData.socketOpen = true
+      for (let i = 0; i < that.globalData.socketMsgQueue.length; i++) {
+        sendSocketMessage(that.globalData.socketMsgQueue[i])
       }
-      socketMsgQueue = []
+      that.globalData.socketMsgQueue = []
     })
-    that.globalData.localSocket.onClose(function (res) {
-      console.log('close:', res)
+    wx.onSocketClose(function (res) {
+      console.log('reconnect')
+      that.globalData.localSocket = wx.connectSocket({
+        url: 'ws://127.0.0.1:8080/websocket'
+      })
     })
-    that.globalData.localSocket.onMessage(function (res) {
+    wx.onSocketMessage(function (res) {
       console.log('message: ', res)
       var resData = JSON.parse(res.data)
+      console.log("in app.js")
       if (resData.action == "loginres" && resData.status == 0) {
         that.globalData.openid = resData.data.openid
         wx.getUserInfo({
@@ -88,14 +87,14 @@ App({
     })
   },
   sendSocketMessage: function (msg) {
-    if (socketOpen) {
+    if (this.globalData.socketOpen) {
       this.globalData.localSocket.send({
         data: JSON.stringify(msg)
       })
     } else {
-      socketMsgQueue.push(msg)
+      this.globalData.socketMsgQueue.push(msg)
     }
-  },*/
+  },
   globalData: {
     userInfo: null,
     openid: {},

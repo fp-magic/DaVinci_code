@@ -20,6 +20,14 @@ Page({
       nickname: "等待玩家4进入",
     }
   },
+  onShow: function() {
+    var that = this
+    wx.onSocketMessage(function (res) {
+      console.log('message: ', res)
+      var resData = JSON.parse(res.data)
+      that.solveMessage(resData)
+    })
+  },
   onLoad: function(option) {
     console.log(option)
     console.log(app.globalData.userInfo)
@@ -34,7 +42,6 @@ Page({
       roomId = option.roomId
       isHost = false
     }
-    that.initSocket()
     if (isHost) {
       that.sendCreateInfo()
     } else {
@@ -46,7 +53,7 @@ Page({
     this.refreshRoomShow()
   },
   startgame: function(e) {
-    this.sendSocketMessage({
+    app.sendSocketMessage({
       "action": "startroomgame",
       "data": {
         "openid": app.globalData.openid,
@@ -57,41 +64,7 @@ Page({
       url: '../game/game?myLoc=' + myLoc + '&roomId=' + roomId + '&playMode=multi',
     })
   },
-  initSocket() {
-    var that = this
-    console.log("in invitefriends.js")
-    app.globalData.localSocket.onOpen(function(res) {
-      console.log('WebSocket连接已打开！')
-      app.globalData.socketOpen = true
-      for (let i = 0; i < app.globalData.socketMsgQueue.length; i++) {
-        that.sendSocketMessage(app.globalData.socketMsgQueue[i])
-      }
-      app.globalData.socketMsgQueue = []
-    })
-    app.globalData.localSocket.onClose(function(res) {
-      console.log('close:', res)
-    })
-    app.globalData.localSocket.onMessage(function(res) {
-      console.log('mesage: ', res)
-      var resData = JSON.parse(res.data)
-      console.log("that",that)
-      console.log("this",this)
-      console
-      that.solveMessages(resData)
-    })
-  },
-  sendSocketMessage: function(msg) {
-    var that = this
-    if (app.globalData.socketOpen) {
-      console.log(msg)
-      app.globalData.localSocket.send({
-        data: JSON.stringify(msg)
-      })
-    } else {
-      app.globalData.socketMsgQueue.push(msg)
-    }
-  },
-  solveMessages:function(resData){
+  solveMessage:function(resData){
     let that=this
     console.log("in invitefriends.js")
     if (resData.action == "enterroomres") {
@@ -131,7 +104,7 @@ Page({
     }
   },
   sendEnterInfo: function() {
-    this.sendSocketMessage({
+    app.sendSocketMessage({
       "action": "enterroom",
       "data": {
         "openid": app.globalData.openid,
@@ -140,7 +113,7 @@ Page({
     })
   },
   sendCreateInfo: function() {
-    this.sendSocketMessage({
+    app.sendSocketMessage({
       "action": "createroom",
       "data": {
         "openid": app.globalData.openid,
@@ -178,5 +151,3 @@ let nickName
 let avatarUrl
 let roomId
 let isHost
-let socketOpen
-let socketMsgQueue = new Array()
