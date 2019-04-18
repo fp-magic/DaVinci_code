@@ -155,7 +155,7 @@ Page({
       Player_turn: gameStatus >= 2 ? (Math.floor(gameStatus / 2) - 1 - myLoc + 4) % 4 + 1 : (-myLoc + 4) % 4 + 1,
       Left_time: showTime
     })
-
+    this.refreshCardBind()
   },
   onLoadAffiliate: function() {
     for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
@@ -211,10 +211,10 @@ Page({
       if (isHost) {
         that.sendStateInfo()
       }
-    }, 5000)
+    }, 200)
   },
   onReady(e) {
-    this.refreshCardBind()
+    
   },
   cardTouchEnd: function(e) { //之后配合前端进行修改
     if (gameStatus != 3 + myLoc * 2) return
@@ -291,53 +291,8 @@ Page({
       var resData = JSON.parse(res.data)
       console.log('mssage: ', resData)
       console.log(resData.action)
-
-      if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
-        let j = 0
-        for (let i = 0; i < resData.data.members.length; i++)
-          if (resData.data.members[i].openid != app.globalData.openid) {
-            openId[j] = resData.data.members[i].openid
-            nickName[j] = resData.data.members[i].nickName
-            avatarUrl[j] = resData.data.members[i].avatarUrl
-            j += 1
-          }
-        if (playMode == "multi") that.sendCardInfo()
-      } else if (resData.action == "otherbroadcast") {
-        console.log("otherbroadcast loaded in")
-        if (resData.data.openid == app.globalData.openid) {
-          let content = resData.data.content
-          console.log("otherbroadcast loaded")
-          if (content.type == "cardInfo") {
-            console.log("cardinfo loaded")
-            myLoc = content.loc
-            cardArrayWhite = content.cardArrayWhite
-            cardArrayBlack = content.cardArrayBlack
-            that.onLoadAffiliate()
-          } else if (content.type == "guessInfo") {
-            let playerLoc = content.playerLoc
-            guessPlayerLoc = content.guessPlayerLoc
-            guessCardName = content.guessCardName
-            guessCardTrueName = content.guessCardTrueName
-            guessCons = content.guessCons
-            player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
-            if (guessCons) {
-              player[playerLoc].successJudge()
-            } else {
-              player[playerLoc].failJudge()
-            }
-          } else if (content.type == "stateInfo") {
-            if (!isHost) {
-              if (gameStatus != content.gameStatus) solveStateChange()
-              gameStatus = content.gameStatus
-              showTime = content.showTime
-            }
-          }
-        }
-      } else if (resData.action == "loginres") {
-        app.globalData.openid = resData.data.openid
-      } else {
-        console.log("no entry message")
-      }
+      that.solveMessage(resData)
+      
     })
   },
   sendSocketMessage: function(msg) {
@@ -349,6 +304,54 @@ Page({
       })
     } else {
       socketMsgQueue.push(msg)
+    }
+  },
+  solveMessage:function(resData){
+    if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
+      let j = 0
+      for (let i = 0; i < resData.data.members.length; i++)
+        if (resData.data.members[i].openid != app.globalData.openid) {
+          openId[j] = resData.data.members[i].openid
+          nickName[j] = resData.data.members[i].nickName
+          avatarUrl[j] = resData.data.members[i].avatarUrl
+          j += 1
+        }
+      if (playMode == "multi") that.sendCardInfo()
+    } else if (resData.action == "otherbroadcast") {
+      console.log("otherbroadcast loaded in")
+      if (resData.data.openid == app.globalData.openid) {
+        let content = resData.data.content
+        console.log("otherbroadcast loaded")
+        if (content.type == "cardInfo") {
+          console.log("cardinfo loaded")
+          myLoc = content.loc
+          cardArrayWhite = content.cardArrayWhite
+          cardArrayBlack = content.cardArrayBlack
+          that.onLoadAffiliate()
+        } else if (content.type == "guessInfo") {
+          let playerLoc = content.playerLoc
+          guessPlayerLoc = content.guessPlayerLoc
+          guessCardName = content.guessCardName
+          guessCardTrueName = content.guessCardTrueName
+          guessCons = content.guessCons
+          player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
+          if (guessCons) {
+            player[playerLoc].successJudge()
+          } else {
+            player[playerLoc].failJudge()
+          }
+        } else if (content.type == "stateInfo") {
+          if (!isHost) {
+            if (gameStatus != content.gameStatus) solveStateChange()
+            gameStatus = content.gameStatus
+            showTime = content.showTime
+          }
+        }
+      }
+    } else if (resData.action == "loginres") {
+      app.globalData.openid = resData.data.openid
+    } else {
+      console.log("no entry message")
     }
   },
   sendCardInfo: function() { //发送牌堆信息，只有主机可以调用
@@ -494,7 +497,7 @@ function changeState() {
       gameStatus = 2
     }
   }
-  let timer = setTimeout(changeState, 10000)
+  let timer = setTimeout(changeState, 1000)
 }
 
 function solveStateChange() {
