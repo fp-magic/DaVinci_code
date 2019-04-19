@@ -6,19 +6,21 @@
       src="https://i.postimg.cc/02YJN94Y/cycle.png"
       mode="aspectFit">
       </cover-image> -->
-      好友对战
+      创建房间
     </button>
   </cover-view>
-<!--调试用begin-->
-  <!-- <cover-view class="friend_magin1_2"> -->
-    <!-- <button id="choose_type" bindtap='friends_2' class="choose_button" style="background:white">
-      <cover-image class="choose_image1"
-      src="https://i.postimg.cc/02YJN94Y/cycle.png"
+
+  <cover-view class="friend_magin2">
+    <button id="choose_type" bindtap="joinroom" class="choose_button" style="background:white">
+      <!-- 加入房间 -->
+      <!-- <cover-image class="choose_image2"
+      src="https://i.postimg.cc/FHhkd2t2/cycle1.png"
       mode="aspectFit">
-      </cover-image>
-    </button> -->
-  <!-- </cover-view> -->
-<!--调试用end-->
+      </cover-image> -->
+      加入房间
+    </button>
+  </cover-view>
+
   <cover-view class="friend_magin2">
     <button id="choose_type" class="choose_button" style="background:white">
       <!-- 在线匹配玩家 -->
@@ -27,17 +29,6 @@
       mode="aspectFit">
       </cover-image> -->
       在线匹配
-    </button>
-  </cover-view>
-
- <cover-view class="friend_magin2">
-    <button id="choose_type" bindtap="joinroom" class="choose_button" style="background:white">
-      <!-- 加入房间 -->
-      <!-- <cover-image class="choose_image2"
-      src="https://i.postimg.cc/FHhkd2t2/cycle1.png"
-      mode="aspectFit">
-      </cover-image> -->
-      加入房间
     </button>
   </cover-view>
 

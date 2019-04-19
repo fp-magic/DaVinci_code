@@ -194,6 +194,11 @@
     <view wx:elif="{{state_judge && Isjudgeright == false}}">
       <text class="action_text"> 真可惜！你猜错了( ╯□╰ )！</text>
     </view>
+    <!--调试用begin-->
+    <view wx:if="{{isGameEnd}}">
+      <text class="action_text">{{gameEndText}}</text>
+    </view>
+    <!--调试用end-->
   </view>
 </view>
 
