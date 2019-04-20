@@ -31,4 +31,4 @@
   </view>
 </view>
 
-<button class="start_button" bindtap='startgame'>开始游戏</button>
+<button class="start_button" bindtap='start_button'>开始游戏</button>

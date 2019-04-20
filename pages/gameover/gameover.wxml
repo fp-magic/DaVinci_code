@@ -1,0 +1,52 @@
+<!--pages/ranking/ranking.wxml-->
+<view class="total">
+
+<!-- gameover图像 -->
+<view class = "title">
+  <image class = "rankingimage"
+  src = "/images/gameover.jpg"
+  style = "width:550rpx; height:200rpx;"
+  mode = "aspectFit"></image>
+  <text class="title-text">本局积分结算</text>
+</view>
+
+<!-- 玩家排名部分 -->
+<view class = "ranking">
+  <!-- 显示排名第一的玩家头像和信息 -->
+  <view id="player1" class = "player" style="display:flex;">
+    <image src="/images/ranking1.jpg" style="height:100rpx; width:100rpx;"></image>
+    <image class="player_avatar" src="{{playerInfo_1.avatarUrl}}"></image>
+    <text class="playerinfo-nickname">+{{playerInfo_1.point}}</text>
+  </view>
+  <!-- 显示排名第二的玩家头像和信息 -->
+  <view id="player2" class = "player" style="display:flex;">
+    <image src="/images/ranking2.jpg" style="height:100rpx; width:100rpx;"></image>
+    <image class="player_avatar" src="{{playerInfo_2.avatarUrl}}"></image>
+    <text class="playerinfo-nickname">+{{playerInfo_2.point}}</text>
+  </view>
+  <!-- 显示排名第三的玩家头像和信息 -->
+  <view id="player3" class = "player" style="display:flex;">
+    <image src="/images/ranking3.jpg" style="height:100rpx; width:100rpx;"></image>
+    <image class="player_avatar" src="{{playerInfo_3.avatarUrl}}"></image>
+    <text class="playerinfo-nickname">+{{playerInfo_3.point}}</text>
+  </view>
+  <!-- 显示排名第四的玩家头像和信息 （根据player-num玩家人数判断需不需要显示） -->
+  <view wx:if="{{playernum == 4}}" id="player4" class = "player" style="display:flex;">
+    <image src="/images/ranking4.jpg" style="height:100rpx; width:100rpx;"></image>
+    <image class="player_avatar" src="{{playerInfo_4.avatarUrl}}"></image>
+    <text class="playerinfo-nickname">+{{playerInfo_4.point}}</text>
+  </view>
+</view>
+
+<!-- 按钮部分 -->
+<view class = "button" style="display:flex;">
+  <navigator url='../index/index'>
+    <button id="goto-menu">返回主界面</button>
+  </navigator>
+
+  <navigator url='../ranking/ranking'>
+    <button id="goto-ranking">查看排行榜</button>
+  </navigator>
+</view>
+
+</view>

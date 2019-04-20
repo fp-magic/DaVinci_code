@@ -8,7 +8,8 @@
     "pages/ranking/ranking",
     "pages/GroupTeam/GroupTeam",
     "pages/invitefriends/invitefriends",
-    "pages/JoinRoom/JoinRoom"
+    "pages/JoinRoom/JoinRoom",
+    "pages/gameover/gameover"
   ],
   "window": {
     "backgroundTextStyle": "light",

@@ -20,7 +20,7 @@ Page({
       nickname: "等待玩家4进入",
     }
   },
-  onShow: function() {
+  onShow: function () {
     var that = this
     wx.onSocketMessage(function (res) {
       console.log('message: ', res)
@@ -28,7 +28,7 @@ Page({
       that.solveMessage(resData)
     })
   },
-  onLoad: function(option) {
+  onLoad: function (option) {
     console.log(option)
     console.log(app.globalData.userInfo)
     var that = this
@@ -52,20 +52,22 @@ Page({
     }
     this.refreshRoomShow()
   },
-  startgame: function(e) {
-    app.sendSocketMessage({
-      "action": "startroomgame",
-      "data": {
-        "openid": app.globalData.openid,
-        "roomid": roomId
-      }
-    })
+  startgame: function (e) {
+    if (myLoc == 0) {
+      app.sendSocketMessage({
+        "action": "startroomgame",
+        "data": {
+          "openid": app.globalData.openid,
+          "roomid": roomId
+        }
+      })
+    }
     wx.navigateTo({
       url: '../game/game?myLoc=' + myLoc + '&roomId=' + roomId + '&playMode=multi',
     })
   },
-  solveMessage:function(resData){
-    let that=this
+  solveMessage: function (resData) {
+    let that = this
     console.log("in invitefriends.js")
     if (resData.action == "enterroomres") {
       for (let i = 0; i < resData.data.members.length; i++)
@@ -103,7 +105,7 @@ Page({
       }
     }
   },
-  sendEnterInfo: function() {
+  sendEnterInfo: function () {
     app.sendSocketMessage({
       "action": "enterroom",
       "data": {
@@ -112,7 +114,7 @@ Page({
       }
     })
   },
-  sendCreateInfo: function() {
+  sendCreateInfo: function () {
     app.sendSocketMessage({
       "action": "createroom",
       "data": {
@@ -121,9 +123,9 @@ Page({
       }
     })
   },
-  refreshRoomShow: function(e) {
+  refreshRoomShow: function (e) {
     var that = this
-    var i = setInterval(function() {
+    var i = setInterval(function () {
       that.setData({
         playerInfo_1: {
           avatarUrl: avatarUrl[0],
@@ -144,6 +146,11 @@ Page({
       })
     }, 100)
   },
+  start_button: function(e){
+    wx.navigateTo({
+      url: '../game/game',
+    })
+  }
 })
 let openId
 let myLoc

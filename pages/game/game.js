@@ -1,22 +1,22 @@
 const app = getApp()
 Page({
   data: {
-
     playerInfo_1: {
-      avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
+      // avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
+      avatarUrl: "/images/head.jpg",
       nickname: "玩家一",
     },
     playerInfo_2: {
       avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
-      nickname: "等待玩家2进入",
+      nickname: "玩家2",
     },
     playerInfo_3: {
       avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
-      nickname: "等待玩家3进入",
+      nickname: "玩家3",
     },
     playerInfo_4: {
       avatarUrl: "https://i.postimg.cc/Hsdbtpbh/blackjoker.jpg",
-      nickname: "等待玩家4进入",
+      nickname: "玩家4",
     },
 
     white_wait: ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11"],
@@ -295,6 +295,7 @@ Page({
       
     })
   },
+  
   sendSocketMessage: function(msg) {
     var that = this
     if (socketOpen) {
@@ -529,7 +530,12 @@ function solveStateChange() {
     }
     showTime = playTime
   } else {
-    if (cardArrayWhite.length <= 0 && cardArrayBlack.length <= 0) gameStatus = 0
+    if (cardArrayWhite.length <= 0 && cardArrayBlack.length <= 0) {
+      gameStatus = 0
+      wx.navigateTo({
+        url: '../gameover/gameover',
+      })
+    }
     console.log(cardArrayWhite, cardArrayBlack, cardVisibleDict)
     if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
       if (gameStatus == 1) {

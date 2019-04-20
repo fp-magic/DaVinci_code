@@ -9,7 +9,7 @@
     maxlength='6'/>
   </view>
   <!-- 调试用begin -->
-  <text>调试用：{{inputValue}}</text>
+  <!-- <text>调试用：{{inputValue}}</text> -->
   <!-- 调试用end -->
   
   <button class="confirmbutton" bindtap="confirmbutton" >确认加入</button>

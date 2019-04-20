@@ -1,0 +1,42 @@
+/* pages/ranking/ranking.wxss */
+.player_avatar{
+  width: 100rpx;
+  height: 100rpx;
+  margin-left: 20rpx;
+}
+.player{
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.playerinfo-nickname{
+  font-size: 60rpx;
+  line-height: 100rpx;
+  margin-left: 50rpx
+}
+
+.button{
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 100rpx;
+}
+
+.title{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.title-text{
+  opacity: 0.5;
+
+}
+
+.ranking{
+  margin-top: 50rpx;
+  display: flex;
+  flex-direction: column;
+  height: 500rpx;
+  justify-content: space-between
+}
