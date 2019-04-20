@@ -91,7 +91,7 @@ Page({
     beginTime = 2 //游戏开始前等待时间
     showTime = 5 //用于显示的当前状态剩余时间
     playTime = 10 //游戏内回合时间
-    midTime = 2 //回合间等待时间
+    midTime = 5 //回合间等待时间
     playerNum = 4 //玩家人数
     gameStatus = 0 //游戏进行状态
     guessStatus = 0
@@ -246,9 +246,10 @@ Page({
   },
   cardArrayTouchEnd: function(e){
     if(gameStatus!=2+myLoc*2)return
+    if(player[myLoc].gotCard)return
     if(playMode=="single"){
-      console.log(e)
-      player[myLoc].getCard(e.id[6]=='w'?1:2)
+      console.log(e.target)
+      player[myLoc].getCard(e.target.id[5]=='w'?1:2)
     }
   },
   listSelectEnd: function(e) { //之后配合前端进行修改
@@ -525,9 +526,9 @@ function solveStateChange() {
       } else {
         if (!player[Math.floor(gameStatus / 2) - 1].guessed) { /*若没猜牌，视为猜牌失败 */
           player[Math.floor(gameStatus / 2) - 1].failJudge()
-        }
-        showTime = midTime
+        }        
       }
+      showTime = midTime
     }
   }
 }
@@ -621,6 +622,7 @@ oneplayer.prototype.getCard = function(getCardMod) {
     this.lastCardIndex = cardArrayBlack.pop()
     cardArrayBlackForBind = countForBind(cardArrayBlack)
   }
+  console.log("getcard",this.lastCardIndex)
   this.cardIndex.push(this.lastCardIndex)
   this.cardIndexForBind = countForBind(this.cardIndex)
   this.cardVisible.push(false)
