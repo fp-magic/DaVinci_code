@@ -237,7 +237,9 @@ Page({
     let buttonId = e.target["id"]
     guessPlayerLoc = Number(buttonId[6]) - 1 //分别表示点击的玩家编号的牌的编号
     guessCardTrueName = buttonId.substring(7, buttonId.length) //之后配合前端进行修改
-    console.log(guessPlyerLoc,myLoc)
+    console.log("cardTouchEnd:")
+    console.log(guessPlayerLoc)
+    console.log(myLoc)
     if (!player[(guessPlayerLoc + myLoc) % 4].visible(guessCardTrueName)) {
       this.setData({
         Isstandedcardchose: true
@@ -493,12 +495,28 @@ function changeState() {
         } else if (gameStatus == 9) {
           if (myLoc != 3) player[3].aiController()
         }
-      } else {
-        //todo!
+      } else if(playMode=="multi"){
+        if (gameStatus == 3) {
+          if(!player[0].haveUnvisibleCard()){
+            player[0].endMyTurn()
+          }
+        } else if (gameStatus == 5) {
+          if (!player[1].haveUnvisibleCard()) {
+            player[1].endMyTurn()
+          }
+        } else if (gameStatus == 7) {
+          if (!player[2].haveUnvisibleCard()) {
+            player[2].endMyTurn()
+          }
+        } else if (gameStatus == 9) {
+          if (!player[3].haveUnvisibleCard()) {
+            player[3].endMyTurn()
+          }
+        }
       }
     }
   }
-  if (showTime <= 0) { //没调用一次，计时器减1
+  if (showTime <= 0) { //每调用一次，计时器减1
     solveStateChange()
     gameStatus += 1
     if (gameStatus == 10) {
@@ -695,6 +713,10 @@ oneplayer.prototype.visible = function(cardTrueName) {
   console.error("not find assigned cardName in oneplayer.visible!")
 }
 oneplayer.prototype.aiController = function() {
+  if(!this.haveUnvisibleCard){//已经没有立牌，则直接结束回合
+    this.endMyTurn()
+    return
+  }
   if (aiMode == "freshman") {
     //随便找个人随便抽张牌随便猜个数
     do {
