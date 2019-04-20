@@ -1,7 +1,20 @@
+const app = getApp()
+let pageId = 1
+
 Page({
-  onLoad(nowPage) {
+  data: {
+    pageindex: 1,
+  },
+  nextpage: function (e) {
+    pageId += 1
     this.setData({
-      title: nowPage.title
+      pageindex: pageId,
+    })
+  },
+  befpage: function (e) {
+    pageId -= 1;
+    this.setData({
+      pageindex: pageId,
     })
   }
 })

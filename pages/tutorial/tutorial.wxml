@@ -1,2 +1,17 @@
-<view style="text-align:center">{{title}}</view>
-<view>点击左上角返回回到之前页面</view>
+<view wx:if="{{pageindex==1}}" class="body">
+  <image mode="aspectFit" class="body-image" src="/images/1.png"></image>
+</view>
+<view wx:if="{{pageindex==2}}" class="body">
+  <image mode="aspectFit" class="body-image" src="/images/2.png"></image>
+</view>
+<view wx:if="{{pageindex==3}}" class="body">
+  <image mode="aspectFit" class="body-image" src="/images/3.png"></image>
+</view>
+<view wx:if="{{pageindex==4}}" class="body">
+  <image mode="aspectFit" class="body-image" src="/images/4.png"></image>
+</view>
+
+<view class = "button" style="display:flex;">
+    <button wx:if="{{pageindex>1}}" bindtap="befpage">上一页</button>
+    <button wx:if="{{pageindex<3}}" bindtap="nextpage">下一页</button>
+</view>

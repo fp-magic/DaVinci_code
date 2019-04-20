@@ -1,1 +1,13 @@
-/* pages/tutorial/tutorial.wxss */
+.title{
+  font-size: 60rpx;
+  line-height: 84rpx;
+}
+.body-image{
+  margin-top: 0rpx;
+  height: 900rpx;
+}
+.body{
+  height: 1000rpx;
+  display: flex;
+  flex-direction: column;
+}
