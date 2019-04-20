@@ -90,7 +90,7 @@ Page({
     let that = this
     beginTime = 2 //游戏开始前等待时间
     showTime = 5 //用于显示的当前状态剩余时间
-    playTime = 10 //游戏内回合时间
+    playTime = 60 //游戏内回合时间
     midTime = 5 //回合间等待时间
     playerNum = 4 //玩家人数
     gameStatus = 0 //游戏进行状态
@@ -174,6 +174,10 @@ Page({
     player[1].setLoc(1)
     player[2].setLoc(2)
     player[3].setLoc(3)
+    score[0] = 0
+    score[1] = 0
+    score[2] = 0
+    score[3] = 0
     this.setData({
       player1_cards: player[(0 + myLoc) % 4].cardIndexForBind,
       player2_cards: player[(1 + myLoc) % 4].cardIndexForBind,
@@ -223,6 +227,20 @@ Page({
             gameEndText: "游戏结束，胜者是" + openId[winnerLoc]
           })
         }
+        score[0] = player[0].score
+        score[1] = player[1].score
+        score[2] = player[2].score
+        score[3] = player[3].score
+        app.globalData.nowNickName = nickName
+        app.globalData.nowAvatarUrl = avatarUrl
+        app.globalData.nowScore = score
+        if (playMode=="multi"&&isHost) {         
+          this.sendScoreInfo()
+        }
+        wx.navigateTo({
+          url: '../gameover/gameover',
+        })
+        return
       }
       if (isHost) {
         that.sendStateInfo()
@@ -246,12 +264,12 @@ Page({
       })
     }
   },
-  cardArrayTouchEnd: function(e){
-    if(gameStatus!=2+myLoc*2)return
-    if(player[myLoc].gotCard)return
-    if(playMode=="single"){
+  cardArrayTouchEnd: function(e) {
+    if (gameStatus != 2 + myLoc * 2) return
+    if (player[myLoc].gotCard) return
+    if (playMode == "single") {
       console.log(e.target)
-      player[myLoc].getCard(e.target.id[5]=='w'?1:2)
+      player[myLoc].getCard(e.target.id[5] == 'w' ? 1 : 2)
     }
   },
   listSelectEnd: function(e) { //之后配合前端进行修改
@@ -267,7 +285,7 @@ Page({
     guessCons = player[(guessPlayerLoc + myLoc) % 4].guessedJudge(guessCardName, guessCardTrueName) //获取猜牌结果
     if (playMode == "single") { //单人模式直接判断
       if (guessCons == true) {
-        player[myLoc].successJudge()
+        player[myLoc].successJudge(guessCardName)
         this.setData({
           Isjudgeright: true
         })
@@ -279,7 +297,7 @@ Page({
       }
     } else if (playMode == "multi") { //多人模式将结果发给其他所有玩家
       if (guessCons == true) {
-        player[myLoc].successJudge()
+        player[myLoc].successJudge(guessCardName)
         this.setData({
           Isjudgeright: true
         })
@@ -346,7 +364,7 @@ Page({
         guessCons = content.guessCons
         player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
         if (guessCons) {
-          player[playerLoc].successJudge()
+          player[playerLoc].successJudge(guessCardName)
         } else {
           player[playerLoc].failJudge()
         }
@@ -412,6 +430,33 @@ Page({
         }
       }
     })
+  },
+  sendScoreInfo: function() { //发送分数信息
+    app.sendSocketMessage({
+      "action": "uploadscores",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId,
+        "store": true,
+        "members": [{
+            "openid": openId[0],
+            "score": score[0]
+          },
+          {
+            "openid": openId[1],
+            "score": score[1]
+          },
+          {
+            "openid": openId[2],
+            "score": score[2]
+          },
+          {
+            "openid": openId[3],
+            "score": score[3]
+          }
+        ]
+      }
+    })
   }
 })
 let beginTime, showTime //进入时间,倒计时用时间
@@ -420,10 +465,11 @@ let playerNum //游戏人数，默认为4
 let gameStatus, gameStatus2, guessStatus
 let guessPlayerLoc, guessCardName, guessCardTrueName, guessCons //要猜的玩家位置编号,牌的名称,牌的实际名称和结果
 let aiMode, playMode, isHost //ai智商,游戏模式
-let roomId, myLoc
-let openId = new Array(4)
-let nickName = new Array(4)
-let avatarUrl = new Array(4)
+let roomId, myLoc //多人游戏中从上一页面（目前是invitefriends.js）传入的信息:房间编号，玩家位置
+let openId = new Array(4) //多人模式中玩家id
+let nickName = new Array(4) //多人模式中玩家昵称
+let avatarUrl = new Array(4) //多人模式中玩家头像链接
+let score = new Array(4) //多人模式中（单人模式其实也有）中玩家分数
 /*gameStatus:当前游戏状态
  **四人时0/1/2/3用于表示自己的状态
  **0表示游戏结束
@@ -476,9 +522,7 @@ function changeState() {
   }
   if (gameStatus != 0 && gameStatus != 1 && ifGameEnd()) { //判断游戏是否结束，若结束，进入游戏结束处理
     gameStatus = 0
-    wx.navigateTo({
-      url: '../gameover/gameover',
-    })
+
     return
   }
   if (guessStatus > 0) {
@@ -495,9 +539,9 @@ function changeState() {
         } else if (gameStatus == 9) {
           if (myLoc != 3) player[3].aiController()
         }
-      } else if(playMode=="multi"){
+      } else if (playMode == "multi") {
         if (gameStatus == 3) {
-          if(!player[0].haveUnvisibleCard()){
+          if (!player[0].haveUnvisibleCard()) {
             player[0].endMyTurn()
           }
         } else if (gameStatus == 5) {
@@ -544,7 +588,7 @@ function solveStateChange() {
       } else {
         if (!player[Math.floor(gameStatus / 2) - 1].guessed) { /*若没猜牌，视为猜牌失败 */
           player[Math.floor(gameStatus / 2) - 1].failJudge()
-        }        
+        }
       }
       showTime = midTime
     }
@@ -607,6 +651,7 @@ function oneplayer() {
   this.playerLoc = 0
   this.guessed = true
   this.gotCard = false
+  this.score = 0
 }
 /*设置姓名
  */
@@ -640,7 +685,7 @@ oneplayer.prototype.getCard = function(getCardMod) {
     this.lastCardIndex = cardArrayBlack.pop()
     cardArrayBlackForBind = countForBind(cardArrayBlack)
   }
-  console.log("getcard",this.lastCardIndex)
+  console.log("getcard", this.lastCardIndex)
   this.cardIndex.push(this.lastCardIndex)
   this.cardIndexForBind = countForBind(this.cardIndex)
   this.cardVisible.push(false)
@@ -680,7 +725,12 @@ oneplayer.prototype.guessedJudge = function(guessingCardName, guessingCardTrueNa
 }
 /*猜牌成功的情况
  */
-oneplayer.prototype.successJudge = function() {
+oneplayer.prototype.successJudge = function(guessCardNameNow) {
+  console.log(guessCardNameNow)
+  if (guessCardNameNow[5] == '6')
+    this.score += 20
+  else
+    this.score += 10
   showTime = playTime
 }
 /*猜牌失败的情况
@@ -713,7 +763,7 @@ oneplayer.prototype.visible = function(cardTrueName) {
   console.error("not find assigned cardName in oneplayer.visible!")
 }
 oneplayer.prototype.aiController = function() {
-  if(!this.haveUnvisibleCard){//已经没有立牌，则直接结束回合
+  if (!this.haveUnvisibleCard) { //已经没有立牌，则直接结束回合
     this.endMyTurn()
     return
   }
@@ -741,7 +791,7 @@ oneplayer.prototype.aiController = function() {
       guessCons = player[3].guessedJudge(guessCardName, guessCardTrueName)
     }
     if (guessCons == true) {
-      this.successJudge()
+      this.successJudge(guessCardName)
     } else {
       this.failJudge()
     }

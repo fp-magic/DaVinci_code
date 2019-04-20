@@ -105,6 +105,9 @@ App({
     localSocket: {},
     socketOpen: null,
     socketMsgQueue :[],
-    reconnectnum: 0
+    reconnectnum: 0,
+    nowNickName:[],//这三个存储当前游戏的结果
+    nowAvatarUrl:[],
+    nowScore:[]
   }
 })
