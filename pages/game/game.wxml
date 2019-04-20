@@ -44,7 +44,7 @@
       <!-- 显示白牌的第一列（不超过七张牌） -->
       <view class="cards_columndisplay">
         <cover-view class="cards_view" wx:for="{{white_left}}">
-          <button id="cards{{item}}" class="cards_button" wx:if="{{index<=6}}">
+          <button id="cards{{item}}" class="cards_button" wx:if="{{index<=6}}" bindtouchend="cardArrayTouchEnd">
             <cover-image class="cards_image"
             src="{{cards_imageURL['whiteblank']}}"
             mode="aspectFit"></cover-image>
@@ -54,7 +54,7 @@
       <!-- 如果剩余的白牌超过7张，在第二列中显示剩余所有牌 -->
       <view class="cards_columndisplay" wx:if="{{white_left[7]!=None}}">
         <!-- <text>{{white_left[4]}}</text> -->
-        <cover-view class="cards_view" wx:for="{{white_left}}" wx:if="{{index>=7}}">
+        <cover-view class="cards_view" wx:for="{{white_left}}" wx:if="{{index>=7}}" bindtouchend="cardArrayTouchEnd">
           <button id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
             src="{{cards_imageURL['whiteblank']}}"
@@ -66,7 +66,7 @@
       <!-- 显示黑牌的第一列（不超过7张） -->
       <view class="cards_columndisplay">
         <cover-view class="cards_view" wx:for="{{black_left}}">
-          <button id="cards{{item}}" class="cards_button" wx:if="{{index <= 6}}">
+          <button id="cards{{item}}" class="cards_button" wx:if="{{index <= 6}}" bindtouchend="cardArrayTouchEnd">
             <cover-image class="cards_image"
             src="{{cards_imageURL['blackblank']}}"
             mode="aspectFit"></cover-image>
@@ -76,7 +76,7 @@
 
       <!-- 如果剩余的黑牌超过7张，在第二列中显示剩余所有牌 -->
       <view class="cards_columndisplay" wx:if="{{black_left[7]!=None}}">
-        <cover-view class="cards_view" wx:for="{{black_left}}" wx:if="{{index>=7}}">
+        <cover-view class="cards_view" wx:for="{{black_left}}" wx:if="{{index>=7}}" bindtouchend="cardArrayTouchEnd">
           <button  id="cards{{item}}" class="cards_button">
             <cover-image class="cards_image"
             src="{{cards_imageURL['blackblank']}}"

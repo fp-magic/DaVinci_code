@@ -210,7 +210,6 @@ Page({
           state_judge: false
         })
       }
-      console.log(gameStatus, "游戏结束，胜者是" + openId[winnerLoc])
       if (gameStatus == 0) {
         that.setData({
           isGameEnd: true
@@ -243,6 +242,13 @@ Page({
       this.setData({
         Isstandedcardchose: true
       })
+    }
+  },
+  cardArrayTouchEnd: function(e){
+    if(gameStatus!=2+myLoc*2)return
+    if(playMode=="single"){
+      console.log(e)
+      player[myLoc].getCard(e.id[6]=='w'?1:2)
     }
   },
   listSelectEnd: function(e) { //之后配合前端进行修改
@@ -510,7 +516,6 @@ function solveStateChange() {
     player[Math.floor(gameStatus / 2) - 1].guessed = false
     showTime = playTime
   } else {
-    console.log(cardArrayWhite, cardArrayBlack, cardVisibleDict)
     if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) { //1为游戏开始，其他为玩家中间回合，修复状态
       if (gameStatus == 1) { //游戏开始
         player[0].setGotCard(false)
@@ -537,7 +542,6 @@ function ifGameEnd() {
       leftPlayer = i
     }
   }
-  console.log("gameendstatus:", emptyPlayerNum, leftPlayer, playerNum)
   if (emptyPlayerNum > playerNum - 1) {
     console.error("emptyPLayerNum more than expected!")
   }
@@ -644,10 +648,8 @@ oneplayer.prototype.getCard = function(getCardMod) {
 oneplayer.prototype.guessedJudge = function(guessingCardName, guessingCardTrueName) {
   if (guessingCardTrueName == guessingCardName) {
     for (let i = 0; i < this.cardNum; i++) {
-      console.log(i)
       if (this.cardIndexForBind[i] == guessingCardTrueName) {
         this.cardVisible[i] = true
-        console.log(i)
         cardVisibleDict[guessingCardTrueName] = true
         break
       }
@@ -675,8 +677,6 @@ oneplayer.prototype.failJudge = function() {
 /*查看是否还有立牌
  */
 oneplayer.prototype.haveUnvisibleCard = function() {
-  console.log(this.cardIndex)
-  console.log(this.cardVisible)
   for (let i = 0; i < this.cardNum; i++) {
     if (this.cardVisible[i] == false)
       return true
