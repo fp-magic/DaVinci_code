@@ -76,6 +76,8 @@ Page({
     state_left: false,
     state_standed: false,
     state_judge: true,
+    isGameEnd: false,
+    gameEndText: "",
 
     Player_turn: 4,
     Left_time: 10,
@@ -89,7 +91,7 @@ Page({
     beginTime = 2 //游戏开始前等待时间
     showTime = 5 //用于显示的当前状态剩余时间
     playTime = 10 //游戏内回合时间
-    midTime = 5 //回合间等待时间
+    midTime = 2 //回合间等待时间
     playerNum = 4 //玩家人数
     gameStatus = 0 //游戏进行状态
     guessStatus = 0
@@ -103,22 +105,23 @@ Page({
     } else {
       isHost = false
     }
-    openId = ["123", "456", "789"]
-    nickName = ["player1", "player2", "player3"]
+    openId = ["000", "123", "456", "789"]
+    nickName = ["me", "player1", "player2", "player3"]
     cardNameForBind = ["white0", "white1", "white2", "white3", "white4", "white5", "white6", "white7", "white8", "white9", "white10", "white11", "black0", "black1", "black2", "black3", "black4", "black5", "black6", "black7", "black8", "black9", "black10", "black11"]
     for (let i = 0; i < cardNameForBind.length; i++) {
       cardVisibleDict[cardNameForBind[i]] = false
-    }
-    if (playMode == "multi") {
-      that.initSocket()
     }
     if (isHost || playMode == "single") {
       changeState()
       cardArrayWhite = shuffleSwap(createArray(12)) //洗牌
       cardArrayBlack = shuffleSwap(createArray(12))
+      randomArray = shuffleSwap(createArray(48))
+      for (let i = 0; i < randomArray.length; i++) {
+        randomArray[i] = randomArray[i] % 2 + 1
+      }
       console.log(app.globalData, playMode, isHost)
       if (playMode == "multi" && isHost) {
-        this.sendSocketMessage({
+        app.sendSocketMessage({
           "action": "getroominfo",
           "data": {
             "openid": app.globalData.openid,
@@ -126,12 +129,11 @@ Page({
           }
         })
       }
-
+      console.log(cardArrayWhite, cardArrayBlack, randomArray)
+      if (playMode == "multi") this.sendCardInfo()
       for (let i = 0; i < cardArrayBlack.length; i++) cardArrayBlack[i] += 12
       cardArrayWhiteForBind = countForBind(cardArrayWhite)
       cardArrayBlackForBind = countForBind(cardArrayBlack)
-      console.log(cardArrayWhite, cardArrayBlack)
-
       if (playerNum == 4) { //发牌
         for (let i = 0; i < 3; i++) player[0].getCard(0)
         for (let i = 0; i < 3; i++) player[1].getCard(0)
@@ -208,22 +210,40 @@ Page({
           state_judge: false
         })
       }
+      console.log(gameStatus, "游戏结束，胜者是" + openId[winnerLoc])
+      if (gameStatus == 0) {
+        that.setData({
+          isGameEnd: true
+        })
+        if (winnerLoc == -1) {
+          that.setData({
+            gameEndText: "游戏结束"
+          })
+        } else {
+          that.setData({
+            gameEndText: "游戏结束，胜者是" + openId[winnerLoc]
+          })
+        }
+      }
       if (isHost) {
         that.sendStateInfo()
       }
-    }, 200)
+    }, 500)
   },
   onReady(e) {
-    
+
   },
   cardTouchEnd: function(e) { //之后配合前端进行修改
     if (gameStatus != 3 + myLoc * 2) return
     let buttonId = e.target["id"]
     guessPlayerLoc = Number(buttonId[6]) - 1 //分别表示点击的玩家编号的牌的编号
     guessCardTrueName = buttonId.substring(7, buttonId.length) //之后配合前端进行修改
-    this.setData({
-      Isstandedcardchose: true
-    })
+    console.log(guessPlyerLoc,myLoc)
+    if (!player[(guessPlayerLoc + myLoc) % 4].visible(guessCardTrueName)) {
+      this.setData({
+        Isstandedcardchose: true
+      })
+    }
   },
   listSelectEnd: function(e) { //之后配合前端进行修改
     if (gameStatus != 3 + myLoc * 2) return
@@ -273,41 +293,17 @@ Page({
   endMyTurn: function(e) {
     showTime = 1
   },
-  initSocket() {
+  onShow() {
     var that = this
-    app.globalData.localSocket.onOpen(function(res) {
-      console.log('WebSocket连接已打开！')
-      socketOpen = true
-      for (let i = 0; i < socketMsgQueue.length; i++) {
-        that.sendSocketMessage(socketMsgQueue[i])
-      }
-      socketMsgQueue = []
-    })
-    app.globalData.localSocket.onClose(function(res) {
-      console.log('close:', res)
-    })
-    app.globalData.localSocket.onMessage(function(res) {
-
+    wx.onSocketMessage(function(res) {
       var resData = JSON.parse(res.data)
       console.log('mssage: ', resData)
       console.log(resData.action)
       that.solveMessage(resData)
-      
     })
   },
-  
-  sendSocketMessage: function(msg) {
+  solveMessage: function(resData) {
     var that = this
-    if (socketOpen) {
-      console.log(msg)
-      app.globalData.localSocket.send({
-        data: JSON.stringify(msg)
-      })
-    } else {
-      socketMsgQueue.push(msg)
-    }
-  },
-  solveMessage:function(resData){
     if (resData.action == "getroominfores") { //不知道服务器会不会反复尝试发送直到成功？如果不是的话这种处理手段有接收不到的风险
       let j = 0
       for (let i = 0; i < resData.data.members.length; i++)
@@ -316,37 +312,40 @@ Page({
           nickName[j] = resData.data.members[i].nickName
           avatarUrl[j] = resData.data.members[i].avatarUrl
           j += 1
+        } else {
+          openId[j] = app.globalData.userInfo.openid
+          nickName[j] = app.globalData.userInfo.nickName
+          avatarUrl[j] = app.globalData.userInfo.avatarUrl
+          j += 1
         }
-      if (playMode == "multi") that.sendCardInfo()
+
     } else if (resData.action == "otherbroadcast") {
       console.log("otherbroadcast loaded in")
-      if (resData.data.openid == app.globalData.openid) {
-        let content = resData.data.content
-        console.log("otherbroadcast loaded")
-        if (content.type == "cardInfo") {
-          console.log("cardinfo loaded")
-          myLoc = content.loc
-          cardArrayWhite = content.cardArrayWhite
-          cardArrayBlack = content.cardArrayBlack
-          that.onLoadAffiliate()
-        } else if (content.type == "guessInfo") {
-          let playerLoc = content.playerLoc
-          guessPlayerLoc = content.guessPlayerLoc
-          guessCardName = content.guessCardName
-          guessCardTrueName = content.guessCardTrueName
-          guessCons = content.guessCons
-          player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
-          if (guessCons) {
-            player[playerLoc].successJudge()
-          } else {
-            player[playerLoc].failJudge()
-          }
-        } else if (content.type == "stateInfo") {
-          if (!isHost) {
-            if (gameStatus != content.gameStatus) solveStateChange()
-            gameStatus = content.gameStatus
-            showTime = content.showTime
-          }
+      let content = resData.data.content
+      console.log("otherbroadcast loaded")
+      if (content.type == "cardInfo") {
+        console.log("cardinfo loaded")
+        cardArrayWhite = content.cardArrayWhite
+        cardArrayBlack = content.cardArrayBlack
+        randomArray = content.randomArray
+        that.onLoadAffiliate()
+      } else if (content.type == "guessInfo") {
+        let playerLoc = content.playerLoc
+        guessPlayerLoc = content.guessPlayerLoc
+        guessCardName = content.guessCardName
+        guessCardTrueName = content.guessCardTrueName
+        guessCons = content.guessCons
+        player[guessPlayerLoc].guessedJudge(guessCardName, guessCardTrueName)
+        if (guessCons) {
+          player[playerLoc].successJudge()
+        } else {
+          player[playerLoc].failJudge()
+        }
+      } else if (content.type == "stateInfo") {
+        if (!isHost) {
+          if (gameStatus != content.gameStatus) solveStateChange()
+          gameStatus = content.gameStatus
+          showTime = content.showTime
         }
       }
     } else if (resData.action == "loginres") {
@@ -360,59 +359,50 @@ Page({
       console.error("the cardInfo is not sent by host player!")
       return
     }
-    for (let i = 0; i < 3; i++) {
-      this.sendSocketMessage({
-        "action": "broadcast",
-        "data": {
-          "openid": app.globalData.openid,
-          "roomid": roomId,
-          "content": {
-            "type": "cardInfo",
-            "openid": openId[i],
-            "loc": i + 1,
-            "cardArrayWhite": cardArrayWhite,
-            "cardArrayBlack": cardArrayBlack
-          }
+    app.sendSocketMessage({
+      "action": "broadcast",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId,
+        "content": {
+          "type": "cardInfo",
+          "cardArrayWhite": cardArrayWhite,
+          "cardArrayBlack": cardArrayBlack,
+          "randomArray": randomArray
         }
-      })
-    }
+      }
+    })
   },
   sendGuessInfo: function() { //发送猜牌信息
-    for (let i = 0; i < 3; i++) {
-      this.sendSocketMessage({
-        "action": "broadcast",
-        "data": {
-          "openid": app.globalData.openid,
-          "roomid": roomId,
-          "content": {
-            "type": "guessInfo",
-            "openid": openId[i],
-            "playerLoc": myLoc,
-            "guessPlayerLoc": guessPlayerLoc,
-            "guessCardName": guessCardName,
-            "guessCardTrueName": guessCardTrueName,
-            "guessCons": guessCons,
-          }
+    app.sendSocketMessage({
+      "action": "broadcast",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId,
+        "content": {
+          "type": "guessInfo",
+          "playerLoc": myLoc,
+          "guessPlayerLoc": guessPlayerLoc,
+          "guessCardName": guessCardName,
+          "guessCardTrueName": guessCardTrueName,
+          "guessCons": guessCons,
         }
-      })
-    }
+      }
+    })
   },
   sendStateInfo: function() { //发送状态信息
-    for (let i = 0; i < 3; i++) {
-      this.sendSocketMessage({
-        "action": "broadcast",
-        "data": {
-          "openid": app.globalData.openid,
-          "roomid": roomId,
-          "content": {
-            "type": "stateInfo",
-            "openid": openId[i],
-            "gameStatus": gameStatus,
-            "showTime": showTime
-          }
+    app.sendSocketMessage({
+      "action": "broadcast",
+      "data": {
+        "openid": app.globalData.openid,
+        "roomid": roomId,
+        "content": {
+          "type": "stateInfo",
+          "gameStatus": gameStatus,
+          "showTime": showTime
         }
-      })
-    }
+      }
+    })
   }
 })
 let beginTime, showTime //进入时间,倒计时用时间
@@ -422,9 +412,9 @@ let gameStatus, gameStatus2, guessStatus
 let guessPlayerLoc, guessCardName, guessCardTrueName, guessCons //要猜的玩家位置编号,牌的名称,牌的实际名称和结果
 let aiMode, playMode, isHost //ai智商,游戏模式
 let roomId, myLoc
-let openId = new Array(3)
-let nickName = new Array(3)
-let avatarUrl = new Array(3)
+let openId = new Array(4)
+let nickName = new Array(4)
+let avatarUrl = new Array(4)
 /*gameStatus:当前游戏状态
  **四人时0/1/2/3用于表示自己的状态
  **0表示游戏结束
@@ -438,6 +428,7 @@ let cardArrayWhite = new Array() //总牌组
 let cardArrayBlack = new Array() //总牌组
 let cardArrayWhiteForBind = new Array()
 let cardArrayBlackForBind = new Array()
+let randomArray = new Array() //随机数数组
 let player = new Array(4)
 player[0] = new oneplayer()
 player[1] = new oneplayer()
@@ -445,8 +436,7 @@ player[2] = new oneplayer()
 player[3] = new oneplayer()
 let cardNameForBind = new Array(24)
 let cardVisibleDict = new Object()
-let socketOpen
-let socketMsgQueue = new Array()
+let winnerLoc //赢家的位置
 //以下两个函数用来产生随机数数组                
 function createArray(max) {
   const arr = [];
@@ -472,10 +462,17 @@ function shuffleSwap(arr) {
 function changeState() {
   showTime -= 1
   console.log(showTime, gameStatus)
+  if (gameStatus < 0 || gameStatus > 9) {
+    console.error("gameStatus out of range in ChangeState()")
+  }
+  if (gameStatus != 0 && gameStatus != 1 && ifGameEnd()) { //判断游戏是否结束，若结束，进入游戏结束处理
+    gameStatus = 0
+    return
+  }
   if (guessStatus > 0) {
     guessStatus -= 1
   } else {
-    if (playMode == "single") {
+    if (playMode == "single") { //单机模式对于其他位置使用ai控制
       if (playerNum == 4) {
         if (gameStatus == 3) {
           if (myLoc != 0) player[0].aiController()
@@ -491,79 +488,63 @@ function changeState() {
       }
     }
   }
-  if (showTime <= 0) {
+  if (showTime <= 0) { //没调用一次，计时器减1
     solveStateChange()
     gameStatus += 1
     if (gameStatus == 10) {
       gameStatus = 2
     }
   }
-  let timer = setTimeout(changeState, 1000)
+  let timer = setTimeout(changeState, 1000) //定时器，每隔左面那个数的毫秒执行一次
 }
 
 function solveStateChange() {
-  if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) {
-    if (gameStatus == 2) {
-      if (!player[0].gotCard) {
-        player[0].getCard(0)
-      }
-      player[0].gotCard = false
-      player[0].guessed = false
-    } else if (gameStatus == 4) {
-      if (!player[1].gotCard) {
-        player[1].getCard(0)
-      }
-      player[1].gotCard = false
-      player[1].guessed = false
-    } else if (gameStatus == 6) {
-      if (!player[2].gotCard) {
-        player[2].getCard(0)
-      }
-      player[2].gotCard = false
-      player[2].guessed = false
-    } else if (gameStatus == 8) {
-      if (!player[3].gotCard) {
-        player[3].getCard(0)
-      }
-      player[3].gotCard = false
-      player[3].guessed = false
+  if (gameStatus == 2 || gameStatus == 4 || gameStatus == 6 || gameStatus == 8) { //玩家游戏回合，摸牌
+    if (!player[Math.floor(gameStatus / 2) - 1].gotCard) { /* 若玩家自己未抽牌，系统帮着抽一张*/
+      player[Math.floor(gameStatus / 2) - 1].getCard(0)
     }
+    player[Math.floor(gameStatus / 2) - 1].gotCard = false /*回复状态*/
+    player[Math.floor(gameStatus / 2) - 1].guessed = false
     showTime = playTime
   } else {
-    if (cardArrayWhite.length <= 0 && cardArrayBlack.length <= 0) {
-      gameStatus = 0
-      wx.navigateTo({
-        url: '../gameover/gameover',
-      })
-    }
     console.log(cardArrayWhite, cardArrayBlack, cardVisibleDict)
-    if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) {
-      if (gameStatus == 1) {
+    if (gameStatus == 1 || gameStatus == 3 || gameStatus == 5 || gameStatus == 7 || gameStatus == 9) { //1为游戏开始，其他为玩家中间回合，修复状态
+      if (gameStatus == 1) { //游戏开始
         player[0].setGotCard(false)
         player[1].setGotCard(false)
         player[2].setGotCard(false)
         player[3].setGotCard(false)
-      } else if (gameStatus == 3) {
-        if (!player[0].guessed) {
-          player[0].failJudge()
+      } else {
+        if (!player[Math.floor(gameStatus / 2) - 1].guessed) { /*若没猜牌，视为猜牌失败 */
+          player[Math.floor(gameStatus / 2) - 1].failJudge()
         }
-      } else if (gameStatus == 5) {
-        if (!player[1].guessed) {
-          player[1].failJudge()
-        }
-      } else if (gameStatus == 7) {
-        if (!player[2].guessed) {
-          player[2].failJudge()
-        }
-      } else if (gameStatus == 9) {
-        if (!player[3].guessed) {
-          player[3].failJudge()
-        }
+        showTime = midTime
       }
-      showTime = midTime
     }
   }
 }
+
+function ifGameEnd() {
+  let emptyPlayerNum = 0
+  let leftPlayer
+  for (let i = 0; i < playerNum; i++) {
+    if (!player[i].haveUnvisibleCard()) {
+      emptyPlayerNum += 1
+    } else {
+      leftPlayer = i
+    }
+  }
+  console.log("gameendstatus:", emptyPlayerNum, leftPlayer, playerNum)
+  if (emptyPlayerNum > playerNum - 1) {
+    console.error("emptyPLayerNum more than expected!")
+  }
+  if (emptyPlayerNum == playerNum - 1) {
+    winnerLoc = leftPlayer
+    return true
+  }
+  return false
+}
+
 /*以下用于定义一位玩家
  **cardIndex:存放玩家手上卡牌的编号,卡牌编号为0-23，其中0-11是白牌，12-23是黑牌
  **cardVisible:存放玩家手上卡牌对其他人的可见性
@@ -622,7 +603,7 @@ oneplayer.prototype.setGotCard = function(ifGotCard) {
 oneplayer.prototype.getCard = function(getCardMod) {
   if (cardArrayWhite.length <= 0 && cardArrayWhite.length <= 0) return
   if (getCardMod != 1 && getCardMod != 2) {
-    getCardMod = Math.floor(Math.random() * (2)) + 1
+    getCardMod = randomArray.pop()
   }
   if (getCardMod == 1 && cardArrayWhite.length <= 0) getCardMod = 2
   if (getCardMod == 2 && cardArrayBlack.length <= 0) getCardMod = 1
@@ -691,11 +672,22 @@ oneplayer.prototype.failJudge = function() {
 /*查看是否还有立牌
  */
 oneplayer.prototype.haveUnvisibleCard = function() {
+  console.log(this.cardIndex)
+  console.log(this.cardVisible)
   for (let i = 0; i < this.cardNum; i++) {
     if (this.cardVisible[i] == false)
       return true
   }
   return false
+}
+/*查看某张牌是否已经明牌 
+ */
+oneplayer.prototype.visible = function(cardTrueName) {
+  for (let i = 0; i < this.cardNum; i++) {
+    if (this.cardIndexForBind[i] == cardTrueName)
+      return this.cardVisible[i]
+  }
+  console.error("not find assigned cardName in oneplayer.visible!")
 }
 oneplayer.prototype.aiController = function() {
   if (aiMode == "freshman") {

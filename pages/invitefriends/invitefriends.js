@@ -52,8 +52,8 @@ Page({
     }
     this.refreshRoomShow()
   },
-  startgame: function (e) {
-    if (myLoc == 0) {
+  startgame: function(e) {
+    if(myLoc==0){
       app.sendSocketMessage({
         "action": "startroomgame",
         "data": {
