@@ -467,6 +467,9 @@ function changeState() {
   }
   if (gameStatus != 0 && gameStatus != 1 && ifGameEnd()) { //判断游戏是否结束，若结束，进入游戏结束处理
     gameStatus = 0
+    wx.navigateTo({
+      url: '../gameover/gameover',
+    })
     return
   }
   if (guessStatus > 0) {
