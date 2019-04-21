@@ -116,19 +116,11 @@
 
     <view class="cards_rowdisplay">
       <cover-view class="cards_view" wx:for="{{player1_cards}}">
-        <button wx:if="{{cards_dict[item]==false}}" id="player1{{item}}" class="cards_button">
+        <button id="player1{{item}}" class="cards_button">
           <cover-image class="cards_image"
           src="{{cards_imageURL[item]}}"
           mode="aspectFit"></cover-image>
         </button>
-        <view style="display: flex; flex-direction: coloumn;" wx:else>
-          <button wx:if="{{cards_dict[item]==true}}" id="player1{{item}}" class="cards_button">
-            <cover-image class="cards_image"
-            src="{{cards_imageURL[cards_dict[item]? item:(item[0]=='w'?'whiteback':'blackback')]}}"
-            mode="aspectFit"></cover-image>
-          </button>
-          <view>{{item}}</view>
-        </view>
       </cover-view>
     </view>
   </view>
